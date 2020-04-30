@@ -7,7 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
-        this.getCommand("test").setExecutor(new CommandTest());
+        this.getCommand("fdnol").setExecutor(new CommandTest());
         this.getServer().getPluginManager().registerEvents(new MyListener(), this);
     }
 

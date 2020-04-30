@@ -1,4 +1,4 @@
-name: "MyPlugin"
+name: "FiveDemandsNotOneLess"
 version: "0.0.1"
 author: "dawn"
 main: "me.lkp111138.plugin.Main"
@@ -6,5 +6,5 @@ api-version: "1.12.2"
 website: "https://google.com"
 commands:
   test:
-    description: "test command"
-    usage: "\u00a7cUsage: /test word-1 word-2 word-3 word-4 word-5"
+    description: "Five demands not one less"
+    usage: "\u00a7cUsage: /fdnol word-1 word-2 word-3 word-4 word-5"
