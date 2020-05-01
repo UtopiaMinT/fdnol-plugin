@@ -1,4 +1,4 @@
-package me.lkp111138.plugin.commands;
+package me.lkp111138.plugin.command;
 
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NBTTagInt;

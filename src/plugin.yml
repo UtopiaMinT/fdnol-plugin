@@ -8,3 +8,11 @@ commands:
   fdnol:
     description: "Five demands not one less"
     usage: "\u00a7cUsage: /fdnol word-1 word-2 word-3 word-4 word-5"
+  customitem:
+    description: "Give the player a predefined custom item"
+    usage: "\u00a7cUsage: /customitem ITEM_ID"
+    aliases:
+      - ci
+  npc:
+    description: "Info about NPCs"
+    usage: "\u00a7cUsage: /npc <subcommand> [args...]"
