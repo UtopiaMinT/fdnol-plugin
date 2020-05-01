@@ -1,5 +1,7 @@
 package me.lkp111138.plugin;
 
+import java.lang.reflect.Field;
+
 public class Util {
     public static int digitCount(int i) {
         if (i >= 1000000000) {
@@ -30,5 +32,20 @@ public class Util {
             return 2;
         }
         return 1;
+    }
+
+    public static Object getPrivateField(String fieldName, Class clazz, Object object) {
+        Field field;
+        Object o = null;
+
+        try {
+            field = clazz.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            o = field.get(object);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return o;
     }
 }

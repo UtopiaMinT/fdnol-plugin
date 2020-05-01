@@ -1,15 +1,19 @@
 package me.lkp111138.plugin.rpg;
 
 import me.lkp111138.plugin.Main;
+import me.lkp111138.plugin.Util;
+import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class CustomMob {
     private String id;

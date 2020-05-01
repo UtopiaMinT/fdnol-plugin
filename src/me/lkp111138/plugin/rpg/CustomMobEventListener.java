@@ -5,9 +5,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
@@ -78,6 +76,22 @@ public class CustomMobEventListener implements Listener {
         Stats stats = Stats.extractFromEntity(entity);
         if (stats != null) {
             stats.setShowBar(false);
+        }
+    }
+
+    // zombies no longer burn in the sun
+    @EventHandler
+    public void onMobCombust(EntityCombustEvent event) {
+        if (event instanceof EntityCombustByEntityEvent) {return;}
+        if (event instanceof EntityCombustByBlockEvent) {return;}
+        event.setCancelled(true);
+    }
+
+    // mobs only target players
+    @EventHandler
+    public void onMobTarget(EntityTargetLivingEntityEvent event) {
+        if (!(event.getTarget() instanceof Player)) {
+            event.setCancelled(true);
         }
     }
 }
