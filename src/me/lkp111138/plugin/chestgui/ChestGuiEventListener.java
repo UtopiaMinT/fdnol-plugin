@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 public class ChestGuiEventListener implements Listener {
@@ -22,6 +23,21 @@ public class ChestGuiEventListener implements Listener {
                     if (handler != null) {
                         handler.handle(event);
                     }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onChestClose(InventoryCloseEvent event) {
+        Inventory closed = event.getInventory();
+        HumanEntity _closer = event.getPlayer();
+        if (_closer instanceof Player) {
+            Player closer = (Player) _closer;
+            ChestGui gui = ChestGui.extractFromEntity(closer);
+            if (gui != null) {
+                if (gui.sameAs(closed)) {
+                    gui.setOpen(false);
                 }
             }
         }

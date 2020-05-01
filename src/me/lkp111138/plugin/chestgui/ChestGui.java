@@ -14,9 +14,10 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class ChestGui {
-    private final String name;
+    private String name;
     private final Slot[] slots;
     private Inventory inventory;
+    private boolean open;
 
     public ChestGui(String name, int size) {
         this.name = name;
@@ -33,6 +34,11 @@ public class ChestGui {
 
     public void set(int i, Slot item) {
         slots[i] = item;
+        inventory.setItem(i, slots[i].itemStack);
+    }
+
+    public void set(int i, ItemStack itemStack) {
+        set(i, new Slot(itemStack, slots[i].handler));
     }
 
     public ChestClickHandler getHandler(int i) {
@@ -41,13 +47,30 @@ public class ChestGui {
 
     public void open(Player player) {
         inventory = Bukkit.getServer().createInventory(null, slots.length, name);
-        inventory.addItem(Arrays.stream(slots).map(x -> x.itemStack).toArray(ItemStack[]::new));
+        inventory.setContents(Arrays.stream(slots).map(x -> x.itemStack).toArray(ItemStack[]::new));
         player.setMetadata("chestgui", new FixedMetadataValue(Main.getInstance(), this));
         player.openInventory(inventory);
+        open = true;
+    }
+
+    public void rename(Player player, String newName) {
+        name = newName;
+//        player.closeInventory();
+        if (open) {
+            open(player);
+        }
     }
 
     public boolean sameAs(Inventory inventory) {
         return Objects.equals(inventory, this.inventory);
+    }
+
+    void setOpen(boolean open) {
+        this.open = open;
+    }
+
+    public boolean isOpen() {
+        return open;
     }
 
     public static class Slot {
