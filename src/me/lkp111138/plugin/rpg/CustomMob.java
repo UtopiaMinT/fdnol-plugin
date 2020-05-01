@@ -41,6 +41,7 @@ public class CustomMob {
         stats.setMaxHealth(health);
         stats.fullHeal();
         stats.setDamage(damage);
+        stats.setShowBar(true);
         entity.setMetadata("rpg", new FixedMetadataValue(Main.getInstance(), stats));
         return entity;
     }

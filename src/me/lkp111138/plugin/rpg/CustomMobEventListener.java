@@ -74,5 +74,10 @@ public class CustomMobEventListener implements Listener {
     @EventHandler
     public void onMobDeath(EntityDeathEvent e) {
         e.setDroppedExp(0);
+        Entity entity = e.getEntity();
+        Stats stats = Stats.extractFromEntity(entity);
+        if (stats != null) {
+            stats.setShowBar(false);
+        }
     }
 }

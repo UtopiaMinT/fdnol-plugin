@@ -28,10 +28,8 @@ public class HealthBarTask implements Runnable {
                         Player player = (Player) entity;
                         player.setFoodLevel(20);
                         sendActionBar(player, String.format("\u00a74❤ %.0f / %.0f", stats.getHealth(), stats.getMaxHealth()));
-                        stats.tick();
-                    } else {
-                        // TODO show a bar above them
                     }
+                    stats.tick(entity.getLocation());
                 }
             }
         });
