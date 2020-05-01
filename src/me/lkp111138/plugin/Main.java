@@ -61,6 +61,7 @@ public class Main extends JavaPlugin {
         this.getCommand("npc").setExecutor(new CommandNpc());
         this.getCommand("custommob").setExecutor(new CommandCustomMob());
         this.getCommand("chestgui").setExecutor(new CommandChestGui());
+        this.getCommand("skills").setExecutor(new CommandSkills());
 
         // module listeners
         this.getServer().getPluginManager().registerEvents(new MyListener(), this);

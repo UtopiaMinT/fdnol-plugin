@@ -26,3 +26,8 @@ commands:
     usage: "\u00a7cUsage: /chestgui"
     aliases:
       - gui
+  skills:
+    description: "Allocates skills"
+    usage: "\u00a7cUsage: /skills"
+    aliases:
+      - skill
