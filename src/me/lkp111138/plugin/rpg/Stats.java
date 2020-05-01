@@ -100,9 +100,10 @@ public class Stats {
     private int levelXP;
 
     // skills
-    private int strengthSkill; // increases damage, slightly decreases hp
-    private int defenseSkill; // decreases damage taken, increases hp, decreases speed
-    private int speedSkill; // increases speed, slightly decreases damage
+    private int powerSkill; // +earth, -wind, +all dmg
+    private int defenseSkill; // +fire, -water, +less dmg intake
+    private int speedSkill; // +wind, -fire, +dodge
+    private int intelligenceSkill; // +water, -earth, +mana
     private int freeSkill; // does nothing
 
     // health bar
@@ -166,7 +167,7 @@ public class Stats {
     public double damage(ElementalDamage elementalDamage) {
         // apply skills
         elementalDamage.neutral = (int) Math.max(0, elementalDamage.neutral * (100 - SKILL_TABLE[defenseSkill]) / 100);
-        elementalDamage.thunder = (int) Math.max(0, (elementalDamage.thunder - elementalDefense.thunder) * (100 - SKILL_TABLE[defenseSkill]) / 100);
+        elementalDamage.wind = (int) Math.max(0, (elementalDamage.wind - elementalDefense.wind) * (100 - SKILL_TABLE[defenseSkill]) / 100);
         elementalDamage.fire = (int) Math.max(0, (elementalDamage.fire - elementalDefense.fire) * (100 - SKILL_TABLE[defenseSkill]) / 100);
         elementalDamage.earth = (int) Math.max(0, (elementalDamage.earth - elementalDefense.earth) * (100 - SKILL_TABLE[defenseSkill]) / 100);
         elementalDamage.water = (int) Math.max(0, (elementalDamage.water - elementalDefense.water) * (100 - SKILL_TABLE[defenseSkill]) / 100);
@@ -192,31 +193,31 @@ public class Stats {
         indicatorEntity.setGravity(false);
         StringBuilder damageBuilder = new StringBuilder();
         if (elementalDamage.neutral >= 1) {
-            damageBuilder.append("\u00a77-").append((int) elementalDamage.neutral);
+            damageBuilder.append("\u00a76-").append(elementalDamage.neutral);
         }
         if (elementalDamage.fire >= 1) {
             if (damageBuilder.length() > 0) {
                 damageBuilder.append("   ");
             }
-            damageBuilder.append("\u00a7c-").append((int) elementalDamage.fire);
+            damageBuilder.append("\u00a7c-").append(elementalDamage.fire);
         }
         if (elementalDamage.water >= 1) {
             if (damageBuilder.length() > 0) {
                 damageBuilder.append("   ");
             }
-            damageBuilder.append("\u00a7b-").append((int) elementalDamage.water);
+            damageBuilder.append("\u00a7b-").append(elementalDamage.water);
         }
         if (elementalDamage.earth >= 1) {
             if (damageBuilder.length() > 0) {
                 damageBuilder.append("   ");
             }
-            damageBuilder.append("\u00a72-").append((int) elementalDamage.earth);
+            damageBuilder.append("\u00a72-").append(elementalDamage.earth);
         }
-        if (elementalDamage.thunder >= 1) {
+        if (elementalDamage.wind >= 1) {
             if (damageBuilder.length() > 0) {
                 damageBuilder.append("   ");
             }
-            damageBuilder.append("\u00a7e-").append((int) elementalDamage.thunder);
+            damageBuilder.append("\u00a77-").append(elementalDamage.wind);
         }
         indicatorEntity.setCustomName(damageBuilder.toString());
         Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), indicatorEntity::remove, 40);
@@ -238,12 +239,13 @@ public class Stats {
         }
     }
 
-    public void allocate(int strengthSkill, int defenseSkill, int speedSkill) {
-        int total = strengthSkill + defenseSkill + speedSkill;
+    public void allocate(int strengthSkill, int defenseSkill, int speedSkill, int intelligenceSkill) {
+        int total = strengthSkill + defenseSkill + speedSkill + intelligenceSkill;
         if (total <= freeSkill) {
-            this.strengthSkill += strengthSkill;
+            this.powerSkill += strengthSkill;
             this.defenseSkill += defenseSkill;
             this.speedSkill += speedSkill;
+            this.intelligenceSkill += intelligenceSkill;
             this.freeSkill -= total;
             double speedAttribute = baseSpeed * (100 + SKILL_TABLE[this.speedSkill]) / 100;
             System.out.println(speedAttribute);
@@ -254,10 +256,11 @@ public class Stats {
     }
 
     public void resetSkills() {
-        freeSkill += strengthSkill + defenseSkill + speedSkill;
-        strengthSkill = 0;
+        freeSkill += powerSkill + defenseSkill + speedSkill + intelligenceSkill;
+        powerSkill = 0;
         defenseSkill = 0;
         speedSkill = 0;
+        intelligenceSkill = 0;
         if (entity instanceof Player) {
             ((Player) entity).setWalkSpeed((float) baseSpeed);
         }
@@ -303,8 +306,8 @@ public class Stats {
         return damage.getDamage();
     }
 
-    public int getStrengthSkill() {
-        return strengthSkill;
+    public int getPowerSkill() {
+        return powerSkill;
     }
 
     public int getDefenseSkill() {
@@ -313,6 +316,10 @@ public class Stats {
 
     public int getSpeedSkill() {
         return speedSkill;
+    }
+
+    public int getIntelligenceSkill() {
+        return intelligenceSkill;
     }
 
     public int getFreeSkill() {

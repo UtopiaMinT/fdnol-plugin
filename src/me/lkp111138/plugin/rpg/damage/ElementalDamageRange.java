@@ -13,8 +13,8 @@ public class ElementalDamageRange {
     public double maxWater;
     public double minFire;
     public double maxFire;
-    public double minThunder;
-    public double maxThunder;
+    public double minWind;
+    public double maxWind;
 
     public static ElementalDamageRange fromConfig(ConfigurationSection section) {
         ElementalDamageRange range = new ElementalDamageRange();
@@ -30,9 +30,9 @@ public class ElementalDamageRange {
         List<Double> fire = section.getDoubleList("fire");
         range.minFire = fire.get(0);
         range.maxFire = fire.get(1);
-        List<Double> thunder = section.getDoubleList("thunder");
-        range.minThunder = thunder.get(0);
-        range.maxThunder = thunder.get(1);
+        List<Double> Wind = section.getDoubleList("wind");
+        range.minWind = Wind.get(0);
+        range.maxWind = Wind.get(1);
         return range;
     }
 
@@ -42,7 +42,7 @@ public class ElementalDamageRange {
         damage.earth = (int) (minEarth + Math.random() * (maxEarth - minEarth));
         damage.water = (int) (minWater + Math.random() * (maxWater - minWater));
         damage.fire = (int) (minFire + Math.random() * (maxFire - minFire));
-        damage.thunder = (int) (minThunder + Math.random() * (maxThunder - minThunder));
+        damage.wind = (int) (minWind + Math.random() * (maxWind - minWind));
         return damage;
     }
 }

@@ -5,9 +5,9 @@ public class ElementalDamage {
     public int earth;
     public int water;
     public int fire;
-    public int thunder;
+    public int wind;
 
     public int sum() {
-        return neutral + earth + water + fire + thunder;
+        return neutral + earth + water + fire + wind;
     }
 }

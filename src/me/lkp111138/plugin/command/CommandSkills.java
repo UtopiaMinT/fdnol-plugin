@@ -21,7 +21,7 @@ public class CommandSkills implements CommandExecutor {
                 return true;
             }
 //            ChestGui gui = new ChestGui("Skills - " + stats.getFreeSkill() + " Points remaining", 27);
-            ChestGui gui = new ChestGui("Skills - " + stats.getFreeSkill() + " Points remaining", 27);
+            ChestGui gui = new ChestGui("Skills - " + stats.getFreeSkill() + " Points remaining", 9);
             reset(gui, stats, player);
             gui.open(player);
         }
@@ -29,41 +29,55 @@ public class CommandSkills implements CommandExecutor {
     }
 
     private void reset(ChestGui gui, Stats stats, Player player) {
-        int strengthSkill = stats.getStrengthSkill();
-        ItemStack strengthBook = strengthBook(strengthSkill);
-        gui.set(4, new ChestGui.Slot(new ItemStack(Material.BARRIER), event -> {
+        ItemStack resetItem = new ItemStack(Material.BARRIER);
+        ItemMeta meta = resetItem.getItemMeta();
+        meta.setDisplayName("\u00a7cReset");
+        gui.set(8, new ChestGui.Slot(resetItem, event -> {
             stats.resetSkills();
             reset(gui, stats, player);
             gui.rename(player, "Skills - " + stats.getFreeSkill() + " Points remaining");
         }));
-        gui.set(11, new ChestGui.Slot(strengthBook, event -> {
+        int strengthSkill = stats.getPowerSkill();
+        ItemStack strengthBook = strengthBook(strengthSkill);
+        gui.set(0, new ChestGui.Slot(strengthBook, event -> {
             int p = 1;
             if (event.getClick() == ClickType.RIGHT) {
                 p = Math.min(5, stats.getFreeSkill());
             }
-            stats.allocate(p, 0, 0);
+            stats.allocate(p, 0, 0, 0);
             reset(gui, stats, player);
             gui.rename(player, "Skills - " + stats.getFreeSkill() + " Points remaining");
         }));
         int defenseSkill = stats.getDefenseSkill();
         ItemStack defenseBook = defenseBook(defenseSkill);
-        gui.set(13, new ChestGui.Slot(defenseBook, event -> {
+        gui.set(1, new ChestGui.Slot(defenseBook, event -> {
             int p = 1;
             if (event.getClick() == ClickType.RIGHT) {
                 p = Math.min(5, stats.getFreeSkill());
             }
-            stats.allocate(0, p, 0);
+            stats.allocate(0, p, 0, 0);
             reset(gui, stats, player);
             gui.rename(player, "Skills - " + stats.getFreeSkill() + " Points remaining");
         }));
         int speedSkill = stats.getSpeedSkill();
         ItemStack speedBook = speedBook(speedSkill);
-        gui.set(15, new ChestGui.Slot(speedBook, event -> {
+        gui.set(2, new ChestGui.Slot(speedBook, event -> {
             int p = 1;
             if (event.getClick() == ClickType.RIGHT) {
                 p = Math.min(5, stats.getFreeSkill());
             }
-            stats.allocate(0, 0, p);
+            stats.allocate(0, 0, p, 0);
+            reset(gui, stats, player);
+            gui.rename(player, "Skills - " + stats.getFreeSkill() + " Points remaining");
+        }));
+        int intelligenceSkill = stats.getIntelligenceSkill();
+        ItemStack intelligenceBook = intelligenceBook(intelligenceSkill);
+        gui.set(3, new ChestGui.Slot(intelligenceBook, event -> {
+            int p = 1;
+            if (event.getClick() == ClickType.RIGHT) {
+                p = Math.min(5, stats.getFreeSkill());
+            }
+            stats.allocate(0, 0, 0, p);
             reset(gui, stats, player);
             gui.rename(player, "Skills - " + stats.getFreeSkill() + " Points remaining");
         }));
@@ -89,6 +103,14 @@ public class CommandSkills implements CommandExecutor {
         ItemStack speedBook = new ItemStack(Material.BOOK_AND_QUILL, Math.max(1, Math.min(64, speedSkill)));
         ItemMeta speedMeta = speedBook.getItemMeta();
         speedMeta.setDisplayName("\u00a7rSpeed: " + speedSkill + " Points");
+        speedBook.setItemMeta(speedMeta);
+        return speedBook;
+    }
+
+    private ItemStack intelligenceBook(int intelligenceSkill) {
+        ItemStack speedBook = new ItemStack(Material.BOOK_AND_QUILL, Math.max(1, Math.min(64, intelligenceSkill)));
+        ItemMeta speedMeta = speedBook.getItemMeta();
+        speedMeta.setDisplayName("\u00a7rIntelligence: " + intelligenceSkill + " Points");
         speedBook.setItemMeta(speedMeta);
         return speedBook;
     }
