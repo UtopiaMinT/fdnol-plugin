@@ -48,18 +48,23 @@ public class CustomMobEventListener implements Listener {
         if (damagerStat == null || damageeStat == null) {
             return;
         }
-        if (true) {
-            if (damagee instanceof LivingEntity) {
-                double damageInHalfHearts = damageeStat.damage(damagerStat.getDamage());
-                if (!(damagee instanceof Player)) {
-                    if (damageeStat.getHealth() > 0) {
-                        ((LivingEntity) damagee).damage(0.0001);
-                    } else {
-                        ((LivingEntity) damagee).damage(999999);
-                    }
+        if (damagee instanceof LivingEntity) {
+            double damageInHalfHearts = damageeStat.damage(damagerStat.getDamage());
+            if (!(damagee instanceof Player)) {
+                if (damageeStat.getHealth() > 0) {
+                    ((LivingEntity) damagee).damage(0.0001);
                 } else {
-                    ((LivingEntity) damagee).damage(damageInHalfHearts);
+                    ((LivingEntity) damagee).damage(999999);
+                    if (damager instanceof Player) {
+                        CustomMob customMob = CustomMob.extractFromEntity(damagee);
+                        if (customMob != null) {
+                            // TODO log all damagers and spread the xp
+                            damagerStat.addXP(customMob.getXP());
+                        }
+                    }
                 }
+            } else {
+                ((LivingEntity) damagee).damage(damageInHalfHearts);
             }
         }
     }

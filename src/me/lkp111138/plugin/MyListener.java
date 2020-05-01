@@ -16,8 +16,8 @@ public class MyListener implements Listener {
         Stats stats = new Stats(joined);
         stats.setMaxHealth(100);
         stats.fullHeal();
-        stats.setHealthRegen(1);
-        stats.setDamage(3);
+        stats.setHealthRegen(1.2);
+        stats.setDamage(20, 40);
         joined.setMetadata("rpg", new FixedMetadataValue(Main.getInstance(), stats));
     }
 }

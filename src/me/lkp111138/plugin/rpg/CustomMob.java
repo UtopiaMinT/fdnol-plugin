@@ -1,26 +1,28 @@
 package me.lkp111138.plugin.rpg;
 
 import me.lkp111138.plugin.Main;
-import me.lkp111138.plugin.Util;
-import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.metadata.MetadataValue;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Random;
 
 public class CustomMob {
     private String id;
     private EntityType type;
     private String name;
     private double health;
-    private double damage;
+    private List<Double> damage;
+    private double regen;
+    private List<Integer> xp;
+    private Random random = new Random();
 
     private static Map<String, CustomMob> mobRegistry = new HashMap<>();
 
@@ -28,8 +30,10 @@ public class CustomMob {
         this.id = id;
         this.name = section.getString("name");
         this.type = EntityType.valueOf(section.getString("type").toUpperCase());
-        this.health = section.getInt("health");
-        this.damage = section.getInt("damage");
+        this.health = section.getDouble("health");
+        this.damage = section.getDoubleList("damage");
+        this.regen = section.getDouble("regen");
+        this.xp = section.getIntegerList("xp");
 
         mobRegistry.put(this.id, this);
     }
@@ -44,14 +48,21 @@ public class CustomMob {
         Stats stats = new Stats(entity);
         stats.setMaxHealth(health);
         stats.fullHeal();
-        stats.setDamage(damage);
+        stats.setDamage(damage.get(0), damage.get(1));
         stats.setShowBar(true);
+        stats.setHealthRegen(regen);
         entity.setMetadata("rpg", new FixedMetadataValue(Main.getInstance(), stats));
+        entity.setMetadata("custommob", new FixedMetadataValue(Main.getInstance(), this));
+        entity.setCustomName(name);
+        entity.setCustomNameVisible(true);
+
         return entity;
     }
 
-    public double getDamage() {
-        return damage;
+    public int getXP() {
+        int lower = this.xp.get(0);
+        int upper = this.xp.get(1);
+        return lower + random.nextInt(upper - lower);
     }
 
     public String getName() {
@@ -60,5 +71,14 @@ public class CustomMob {
 
     public EntityType getType() {
         return type;
+    }
+
+    public static CustomMob extractFromEntity(Entity entity) {
+        for (MetadataValue value : entity.getMetadata("custommob")) {
+            if (value.getOwningPlugin().equals(Main.getInstance())) {
+                return (CustomMob) value.value();
+            }
+        }
+        return null;
     }
 }
