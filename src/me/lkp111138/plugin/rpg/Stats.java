@@ -5,7 +5,10 @@ import me.lkp111138.plugin.Util;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 
 import java.util.Random;
@@ -67,7 +70,7 @@ public class Stats {
             90.31, 90.40, 90.48, 90.56, 90.64, 90.73, 90.81, 90.89, 90.97, 91.05
     };
 
-    private final LivingEntity entity;
+    private final Entity entity;
     private final Random random = new Random();
     private double baseSpeed;
 
@@ -101,7 +104,7 @@ public class Stats {
     private boolean showBar;
     private ArmorStand barEntity;
 
-    public Stats(LivingEntity entity) {
+    public Stats(Entity entity) {
         this.entity = entity;
         if (entity instanceof Player)
         this.baseSpeed = ((Player) entity).getWalkSpeed();
@@ -179,7 +182,7 @@ public class Stats {
             setMaxHealth(maxHealth + 10);
             fullHeal();
             if (entity instanceof Player) {
-                entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(getMaxHearts() * 2);
+                ((Player) entity).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(getMaxHearts() * 2);
             }
         }
     }
