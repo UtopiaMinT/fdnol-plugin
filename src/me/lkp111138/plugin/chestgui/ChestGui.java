@@ -34,7 +34,9 @@ public class ChestGui {
 
     public void set(int i, Slot item) {
         slots[i] = item;
-        inventory.setItem(i, slots[i].itemStack);
+        if (inventory != null) {
+            inventory.setItem(i, slots[i].itemStack);
+        }
     }
 
     public void set(int i, ItemStack itemStack) {
