@@ -21,3 +21,8 @@ commands:
     usage: "\u00a7cUsage: /custommob spawn MOB_ID"
     aliases:
       - cm
+  chestgui:
+    description: "Opens a chest GUI"
+    usage: "\u00a7cUsage: /chestgui"
+    aliases:
+      - gui

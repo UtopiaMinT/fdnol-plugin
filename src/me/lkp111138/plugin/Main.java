@@ -1,9 +1,7 @@
 package me.lkp111138.plugin;
 
-import me.lkp111138.plugin.command.CommandCustomItem;
-import me.lkp111138.plugin.command.CommandCustomMob;
-import me.lkp111138.plugin.command.CommandNpc;
-import me.lkp111138.plugin.command.CommandTest;
+import me.lkp111138.plugin.chestgui.ChestGuiEventListener;
+import me.lkp111138.plugin.command.*;
 import me.lkp111138.plugin.item.CustomItem;
 import me.lkp111138.plugin.rpg.CustomMob;
 import me.lkp111138.plugin.rpg.CustomMobEventListener;
@@ -39,24 +37,29 @@ public class Main extends JavaPlugin {
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TrackingTask(), 0, 5);
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new HealthBarTask(), 0, 2);
         // custom items
-        ConfigurationSection itemSection = config.getConfigurationSection("me/lkp111138/plugin/item");
+        ConfigurationSection itemSection = config.getConfigurationSection("item");
         for (String key : itemSection.getKeys(false)) {
             new CustomItem(key, itemSection.getConfigurationSection(key));
         }
         // custom mobs
-        ConfigurationSection mobSection = config.getConfigurationSection("rpg");
+        ConfigurationSection mobSection = config.getConfigurationSection("mob");
         for (String key : mobSection.getKeys(false)) {
             new CustomMob(key, mobSection.getConfigurationSection(key));
         }
         saveConfig();
 
+        // commands
         this.getCommand("fdnol").setExecutor(new CommandTest());
         this.getCommand("customitem").setExecutor(new CommandCustomItem());
         this.getCommand("npc").setExecutor(new CommandNpc());
         this.getCommand("custommob").setExecutor(new CommandCustomMob());
+        this.getCommand("chestgui").setExecutor(new CommandChestGui());
+
+        // module listeners
         this.getServer().getPluginManager().registerEvents(new MyListener(), this);
         this.getServer().getPluginManager().registerEvents(new NPCEventListener(), this);
         this.getServer().getPluginManager().registerEvents(new CustomMobEventListener(), this);
+        this.getServer().getPluginManager().registerEvents(new ChestGuiEventListener(), this);
     }
 
     @Override
