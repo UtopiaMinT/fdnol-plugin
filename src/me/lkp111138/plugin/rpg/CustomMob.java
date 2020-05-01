@@ -41,7 +41,7 @@ public class CustomMob {
     public Entity spawnNew(Location location) {
         World world = location.getWorld();
         Entity entity = world.spawnEntity(location, type);
-        Stats stats = new Stats();
+        Stats stats = new Stats(entity);
         stats.setMaxHealth(health);
         stats.fullHeal();
         stats.setDamage(damage);

@@ -7,11 +7,14 @@ import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 
 public class Stats {
     private static final double K = 0.261648041296;
     private static final double A = 1.79654388542;
+
+    private final Entity entity;
 
     // defenses
     private double health;
@@ -26,9 +29,16 @@ public class Stats {
     private long lastDamage;
     private long lastNaturalHeal;
 
+    // stats
+    private int deaths;
+
     // health bar
     private boolean showBar;
     private ArmorStand barEntity;
+
+    public Stats(Entity entity) {
+        this.entity = entity;
+    }
 
     public void tick(Location entityLoc) {
         long now = System.currentTimeMillis();
@@ -70,10 +80,19 @@ public class Stats {
         }
     }
 
-    public boolean damage(double amount) {
+    public double damage(double amount) {
+        if (health < amount && entity instanceof Player) {
+            // players don't really die, they get a death stat and get tped to spawn instead
+            double damage = getHealthHalfHearts() - 0.0001;
+            fullHeal();
+            ++deaths;
+            entity.teleport(new Location(entity.getWorld(), -111.5, 104, 272.5));
+            ((Player) entity).sendTitle("\u00a74You have died!", "Soul Integrity dropped by 18%", 10, 50, 10);
+            return damage;
+        }
         health -= amount;
         lastDamage = System.currentTimeMillis();
-        return health > 0;
+        return amount / maxHealth * maxHearts * 2;
     }
 
     public void damagePercent(double percent) {

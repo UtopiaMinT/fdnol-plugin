@@ -13,7 +13,7 @@ public class MyListener implements Listener {
         Player joined = event.getPlayer();
         joined.sendMessage("\u00a76Five demands, not one less.");
         joined.setCollidable(false);
-        Stats stats = new Stats();
+        Stats stats = new Stats(joined);
         stats.setMaxHealth(100);
         stats.fullHeal();
         stats.setHealthRegen(1);
