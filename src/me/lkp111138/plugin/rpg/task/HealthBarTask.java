@@ -1,9 +1,7 @@
 package me.lkp111138.plugin.rpg.task;
 
+import me.lkp111138.plugin.Util;
 import me.lkp111138.plugin.rpg.Stats;
-import net.minecraft.server.v1_12_R1.ChatMessageType;
-import net.minecraft.server.v1_12_R1.IChatBaseComponent;
-import net.minecraft.server.v1_12_R1.PacketPlayOutChat;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -27,18 +25,11 @@ public class HealthBarTask implements Runnable {
                         ((CraftPlayer) entity).setMaxHealth(stats.getMaxHearts() * 2);
                         Player player = (Player) entity;
                         player.setFoodLevel(20);
-                        sendActionBar(player, String.format("\u00a74❤ %.0f / %.0f", stats.getHealth(), stats.getMaxHealth()));
+                        Util.sendActionBar(player, String.format("\u00a74❤ %.0f / %.0f", stats.getHealth(), stats.getMaxHealth()));
                     }
                     stats.tick(entity.getLocation());
                 }
             }
         });
-    }
-
-    @SuppressWarnings("rawtypes")
-    private static void sendActionBar(Player player, String message) {
-        IChatBaseComponent cbc = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}");
-        PacketPlayOutChat ppoc = new PacketPlayOutChat(cbc, ChatMessageType.GAME_INFO);
-        ((CraftPlayer)player).getHandle().playerConnection.sendPacket(ppoc);
     }
 }

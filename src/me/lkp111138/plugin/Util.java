@@ -1,5 +1,11 @@
 package me.lkp111138.plugin;
 
+import net.minecraft.server.v1_12_R1.ChatMessageType;
+import net.minecraft.server.v1_12_R1.IChatBaseComponent;
+import net.minecraft.server.v1_12_R1.PacketPlayOutChat;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.entity.Player;
+
 import java.lang.reflect.Field;
 
 public class Util {
@@ -47,5 +53,12 @@ public class Util {
         }
 
         return o;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public static void sendActionBar(Player player, String message) {
+        IChatBaseComponent cbc = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}");
+        PacketPlayOutChat ppoc = new PacketPlayOutChat(cbc, ChatMessageType.GAME_INFO);
+        ((CraftPlayer)player).getHandle().playerConnection.sendPacket(ppoc);
     }
 }
