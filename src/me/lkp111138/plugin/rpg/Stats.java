@@ -2,6 +2,10 @@ package me.lkp111138.plugin.rpg;
 
 import me.lkp111138.plugin.Main;
 import me.lkp111138.plugin.Util;
+import me.lkp111138.plugin.rpg.damage.ElementalDamage;
+import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
+import me.lkp111138.plugin.rpg.defense.ElementalDefense;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -10,6 +14,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.util.Vector;
 
 import java.util.Random;
 
@@ -79,10 +84,10 @@ public class Stats {
     private double maxHealth;
     private int maxHearts;
     private double healthRegen;
+    private ElementalDefense elementalDefense;
 
     // base damage
-    private double damageMin;
-    private double damageMax;
+    private ElementalDamageRange damage;
 
     // time markers
     private long lastDamage;
@@ -125,6 +130,8 @@ public class Stats {
                 barEntity.setInvulnerable(true);
                 barEntity.setVisible(false);
                 barEntity.setCustomNameVisible(true);
+                barEntity.setVelocity(entity.getVelocity());
+                barEntity.setGravity(false);
             }
             StringBuilder nameBuilder = new StringBuilder("[");
             int digitCount = Util.digitCount((int) health);
@@ -141,7 +148,8 @@ public class Stats {
             String name = nameBuilder.toString();
             int fraction = (int) ((24 * health / maxHealth + 1) / 2);
             barEntity.setCustomName("\u00a74" + name.substring(0, fraction) + "\u00a78" + name.substring(fraction));
-            barEntity.teleport(entityLoc);
+            Vector adjustment = new Vector(0, entity.getHeight() - 2.05, 0);
+            barEntity.teleport(entityLoc.add(adjustment));
         } else {
             if (barEntity != null) {
                 barEntity.remove();
@@ -155,9 +163,14 @@ public class Stats {
         }
     }
 
-    public double damage(double amount) {
+    public double damage(ElementalDamage elementalDamage) {
         // apply skills
-        amount *= (100 - SKILL_TABLE[defenseSkill]) / 100;
+        elementalDamage.neutral = (int) Math.max(0, elementalDamage.neutral * (100 - SKILL_TABLE[defenseSkill]) / 100);
+        elementalDamage.thunder = (int) Math.max(0, (elementalDamage.thunder - elementalDefense.thunder) * (100 - SKILL_TABLE[defenseSkill]) / 100);
+        elementalDamage.fire = (int) Math.max(0, (elementalDamage.fire - elementalDefense.fire) * (100 - SKILL_TABLE[defenseSkill]) / 100);
+        elementalDamage.earth = (int) Math.max(0, (elementalDamage.earth - elementalDefense.earth) * (100 - SKILL_TABLE[defenseSkill]) / 100);
+        elementalDamage.water = (int) Math.max(0, (elementalDamage.water - elementalDefense.water) * (100 - SKILL_TABLE[defenseSkill]) / 100);
+        double amount = elementalDamage.sum();
         if (health < amount && entity instanceof Player) {
             // players don't really die, they get a death stat and get tped to spawn instead
             double damage = getHealthHalfHearts() - 0.0001;
@@ -168,7 +181,45 @@ public class Stats {
             return damage;
         }
         health -= amount;
+        // damage indicator
         lastDamage = System.currentTimeMillis();
+        Vector adjustment = new Vector(0, entity.getHeight() - 1.75, 0);
+        Location entityLoc = entity.getLocation().add(adjustment);
+        ArmorStand indicatorEntity = (ArmorStand) entityLoc.getWorld().spawnEntity(entityLoc, EntityType.ARMOR_STAND);
+        indicatorEntity.setCustomNameVisible(true);
+        indicatorEntity.setInvulnerable(true);
+        indicatorEntity.setVisible(false);
+        indicatorEntity.setGravity(false);
+        StringBuilder damageBuilder = new StringBuilder();
+        if (elementalDamage.neutral >= 1) {
+            damageBuilder.append("\u00a77-").append((int) elementalDamage.neutral);
+        }
+        if (elementalDamage.fire >= 1) {
+            if (damageBuilder.length() > 0) {
+                damageBuilder.append("   ");
+            }
+            damageBuilder.append("\u00a7c-").append((int) elementalDamage.fire);
+        }
+        if (elementalDamage.water >= 1) {
+            if (damageBuilder.length() > 0) {
+                damageBuilder.append("   ");
+            }
+            damageBuilder.append("\u00a7b-").append((int) elementalDamage.water);
+        }
+        if (elementalDamage.earth >= 1) {
+            if (damageBuilder.length() > 0) {
+                damageBuilder.append("   ");
+            }
+            damageBuilder.append("\u00a72-").append((int) elementalDamage.earth);
+        }
+        if (elementalDamage.thunder >= 1) {
+            if (damageBuilder.length() > 0) {
+                damageBuilder.append("   ");
+            }
+            damageBuilder.append("\u00a7e-").append((int) elementalDamage.thunder);
+        }
+        indicatorEntity.setCustomName(damageBuilder.toString());
+        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), indicatorEntity::remove, 40);
         return amount / maxHealth * maxHearts * 2;
     }
 
@@ -213,7 +264,9 @@ public class Stats {
     }
 
     public void damagePercent(double percent) {
-        damage(percent / 100 * maxHealth);
+        ElementalDamage elementalDamage = new ElementalDamage();
+        elementalDamage.neutral = (int) (percent / 100 * maxHealth);
+        damage(elementalDamage);
     }
 
     public void heal(double amount) {
@@ -245,9 +298,9 @@ public class Stats {
         return healthRegen;
     }
 
-    public double getDamage() {
-        double damage = damageMin + (damageMax - damageMin) * random.nextFloat();
-        return damage * (100 + SKILL_TABLE[strengthSkill]) / 100;
+    public ElementalDamage getDamage() {
+        // TODO strength
+        return damage.getDamage();
     }
 
     public int getStrengthSkill() {
@@ -275,13 +328,16 @@ public class Stats {
         this.maxHearts = (int) (A * Math.pow(maxHealth, K));
     }
 
-    public void setDamage(double damageMin, double damageMax) {
-        this.damageMin = damageMin;
-        this.damageMax = damageMax;
+    public void setDamage(ElementalDamageRange damage) {
+        this.damage = damage;
     }
 
     public void setShowBar(boolean showBar) {
         this.showBar = showBar;
+    }
+
+    public void setElementalDefense(ElementalDefense elementalDefense) {
+        this.elementalDefense = elementalDefense;
     }
 
     public static Stats extractFromEntity(Entity entity) {

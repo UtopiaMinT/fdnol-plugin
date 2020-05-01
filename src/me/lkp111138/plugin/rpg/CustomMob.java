@@ -1,6 +1,8 @@
 package me.lkp111138.plugin.rpg;
 
 import me.lkp111138.plugin.Main;
+import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
+import me.lkp111138.plugin.rpg.defense.ElementalDefense;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,9 +21,10 @@ public class CustomMob {
     private EntityType type;
     private String name;
     private double health;
-    private List<Double> damage;
+    private ElementalDamageRange damage;
     private double regen;
     private List<Integer> xp;
+    private ElementalDefense elementalDefense;
     private Random random = new Random();
 
     private static Map<String, CustomMob> mobRegistry = new HashMap<>();
@@ -31,9 +34,10 @@ public class CustomMob {
         this.name = section.getString("name");
         this.type = EntityType.valueOf(section.getString("type").toUpperCase());
         this.health = section.getDouble("health");
-        this.damage = section.getDoubleList("damage");
+        this.damage = ElementalDamageRange.fromConfig(section.getConfigurationSection("damage"));
         this.regen = section.getDouble("regen");
         this.xp = section.getIntegerList("xp");
+        this.elementalDefense = ElementalDefense.fromConfig(section.getConfigurationSection("defense"));
 
         mobRegistry.put(this.id, this);
     }
@@ -48,9 +52,10 @@ public class CustomMob {
         Stats stats = new Stats(entity);
         stats.setMaxHealth(health);
         stats.fullHeal();
-        stats.setDamage(damage.get(0), damage.get(1));
+        stats.setDamage(damage);
         stats.setShowBar(true);
         stats.setHealthRegen(regen);
+        stats.setElementalDefense(elementalDefense);
         entity.setMetadata("rpg", new FixedMetadataValue(Main.getInstance(), stats));
         entity.setMetadata("custommob", new FixedMetadataValue(Main.getInstance(), this));
         entity.setCustomName(name);
