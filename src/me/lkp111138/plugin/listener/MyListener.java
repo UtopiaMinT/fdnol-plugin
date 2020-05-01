@@ -3,11 +3,15 @@ package me.lkp111138.plugin.listener;
 import me.lkp111138.plugin.Main;
 import me.lkp111138.plugin.model.PlayerStats;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
 
 public class MyListener implements Listener {
@@ -18,23 +22,55 @@ public class MyListener implements Listener {
         joined.setCollidable(false);
         PlayerStats stats = new PlayerStats();
         stats.setMaxHealth(100);
-        stats.heal(100);
+        stats.fullHeal();
         stats.setHealthRegen(1);
+        stats.setDamage(3);
         joined.setMetadata("rpg", new FixedMetadataValue(Main.getInstance(), stats));
     }
 
     @EventHandler
-    public void onFallDamage(EntityDamageEvent event) {
+    public void onDamage(EntityDamageEvent event) {
         Entity entity = event.getEntity();
+        event.setCancelled(PlayerStats.extractFromEntity(entity) != null && event.getDamage() < 100);
+        // player fall damage
         if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-            event.setCancelled(true);
             if (entity instanceof Player) {
-                PlayerStats stats = PlayerStats.extractFromPlayer((Player) entity);
+                PlayerStats stats = PlayerStats.extractFromEntity(entity);
                 if (stats != null) {
                     if (event.getDamage() > 3) {
                         stats.damagePercent(2.5 * (event.getDamage() - 3));
                     }
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamageEntity(EntityDamageByEntityEvent event) {
+        Entity damager = event.getDamager();
+        Entity damagee = event.getEntity();
+        PlayerStats damagerStat = PlayerStats.extractFromEntity(damager);
+        PlayerStats damageeStat = PlayerStats.extractFromEntity(damagee);
+        if (damagerStat == null || damageeStat == null) {
+            return;
+        }
+        if (!damageeStat.damage(damagerStat.getDamage())) {
+            if (damagee instanceof LivingEntity) {
+                if (!(damagee instanceof Player)) {
+                    ((LivingEntity) damagee).damage(999999);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void onInteract(PlayerInteractEntityEvent event) {
+        Entity entity = event.getRightClicked();
+        PlayerStats stats = PlayerStats.extractFromEntity(entity);
+        if (stats != null) {
+            event.setCancelled(true);
+            if (event.getHand() == EquipmentSlot.HAND) {
+                event.getPlayer().sendMessage(String.valueOf(stats.getHealth()));
             }
         }
     }

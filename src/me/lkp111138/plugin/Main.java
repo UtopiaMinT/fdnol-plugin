@@ -1,10 +1,12 @@
 package me.lkp111138.plugin;
 
 import me.lkp111138.plugin.command.CommandCustomItem;
+import me.lkp111138.plugin.command.CommandCustomMob;
 import me.lkp111138.plugin.command.CommandNpc;
 import me.lkp111138.plugin.command.CommandTest;
 import me.lkp111138.plugin.listener.MyListener;
 import me.lkp111138.plugin.model.CustomItem;
+import me.lkp111138.plugin.model.CustomMob;
 import me.lkp111138.plugin.npc.NPC;
 import me.lkp111138.plugin.npc.NPCEventListener;
 import me.lkp111138.plugin.npc.TrackingTask;
@@ -42,11 +44,17 @@ public class Main extends JavaPlugin {
         for (String key : itemSection.getKeys(false)) {
             new CustomItem(key, itemSection.getConfigurationSection(key));
         }
+        // custom mobs
+        ConfigurationSection mobSection = config.getConfigurationSection("mob");
+        for (String key : mobSection.getKeys(false)) {
+            new CustomMob(key, mobSection.getConfigurationSection(key));
+        }
         saveConfig();
 
         this.getCommand("fdnol").setExecutor(new CommandTest());
         this.getCommand("customitem").setExecutor(new CommandCustomItem());
         this.getCommand("npc").setExecutor(new CommandNpc());
+        this.getCommand("custommob").setExecutor(new CommandCustomMob());
         this.getServer().getPluginManager().registerEvents(new MyListener(), this);
         this.getServer().getPluginManager().registerEvents(new NPCEventListener(), this);
     }

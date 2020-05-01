@@ -16,3 +16,8 @@ commands:
   npc:
     description: "Info about NPCs"
     usage: "\u00a7cUsage: /npc <subcommand> [args...]"
+  custommob:
+    description: "Spawns a custom mob"
+    usage: "\u00a7cUsage: /custommob spawn MOB_ID"
+    aliases:
+      - cm

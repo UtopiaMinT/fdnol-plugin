@@ -1,6 +1,7 @@
 package me.lkp111138.plugin.model;
 
 import me.lkp111138.plugin.Main;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 
@@ -11,7 +12,9 @@ public class PlayerStats {
     private double health;
     private double maxHealth;
     private int maxHearts;
-    public double healthRegen;
+    private double healthRegen;
+
+    private double damage;
 
     private long lastDamage;
     private long lastNaturalHeal;
@@ -28,6 +31,10 @@ public class PlayerStats {
         return healthRegen;
     }
 
+    public double getDamage() {
+        return damage;
+    }
+
     public void setHealthRegen(double healthRegen) {
         this.healthRegen = healthRegen;
     }
@@ -35,6 +42,10 @@ public class PlayerStats {
     public void setMaxHealth(double maxHealth) {
         this.maxHealth = maxHealth;
         this.maxHearts = (int) (A * Math.pow(maxHealth, K));
+    }
+
+    public void setDamage(double damage) {
+        this.damage = damage;
     }
 
     public boolean damage(double amount) {
@@ -50,6 +61,10 @@ public class PlayerStats {
     public void heal(double amount) {
         health += amount;
         health = health > maxHealth ? maxHealth : health;
+    }
+
+    public void fullHeal() {
+        health = maxHealth;
     }
 
     public int getMaxHearts() {
@@ -70,8 +85,8 @@ public class PlayerStats {
         }
     }
 
-    public static PlayerStats extractFromPlayer(Player player) {
-        for (MetadataValue value : player.getMetadata("rpg")) {
+    public static PlayerStats extractFromEntity(Entity entity) {
+        for (MetadataValue value : entity.getMetadata("rpg")) {
             if (value.getOwningPlugin().equals(Main.getInstance())) {
                 return (PlayerStats) value.value();
             }
