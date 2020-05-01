@@ -1,6 +1,6 @@
 package me.lkp111138.plugin.command;
 
-import me.lkp111138.plugin.model.CustomMob;
+import me.lkp111138.plugin.rpg.CustomMob;
 import me.lkp111138.plugin.npc.NPC;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,7 +21,7 @@ public class CommandCustomMob implements CommandExecutor {
                         try {
                             CustomMob mob = CustomMob.get(args[1]);
                             if (mob == null) {
-                                sender.sendMessage("\u00a7cNo such mob: " + args[1]);
+                                sender.sendMessage("\u00a7cNo such rpg: " + args[1]);
                                 NPC.save();
                             } else {
                                 mob.spawnNew(((Player) sender).getLocation());

@@ -1,11 +1,10 @@
-package me.lkp111138.plugin.model;
+package me.lkp111138.plugin.rpg;
 
 import me.lkp111138.plugin.Main;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 
-public class PlayerStats {
+public class Stats {
     private static final double K = 0.261648041296;
     private static final double A = 1.79654388542;
 
@@ -85,10 +84,10 @@ public class PlayerStats {
         }
     }
 
-    public static PlayerStats extractFromEntity(Entity entity) {
+    public static Stats extractFromEntity(Entity entity) {
         for (MetadataValue value : entity.getMetadata("rpg")) {
             if (value.getOwningPlugin().equals(Main.getInstance())) {
-                return (PlayerStats) value.value();
+                return (Stats) value.value();
             }
         }
         return null;

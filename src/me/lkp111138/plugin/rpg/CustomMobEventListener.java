@@ -1,7 +1,5 @@
-package me.lkp111138.plugin.listener;
+package me.lkp111138.plugin.rpg;
 
-import me.lkp111138.plugin.Main;
-import me.lkp111138.plugin.model.PlayerStats;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -11,28 +9,13 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.metadata.FixedMetadataValue;
 
-public class MyListener implements Listener {
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player joined = event.getPlayer();
-        joined.sendMessage("\u00a76Five demands, not one less.");
-        joined.setCollidable(false);
-        PlayerStats stats = new PlayerStats();
-        stats.setMaxHealth(100);
-        stats.fullHeal();
-        stats.setHealthRegen(1);
-        stats.setDamage(3);
-        joined.setMetadata("rpg", new FixedMetadataValue(Main.getInstance(), stats));
-    }
-
+public class CustomMobEventListener implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
         Entity entity = event.getEntity();
-        if (PlayerStats.extractFromEntity(entity) != null) {
+        if (Stats.extractFromEntity(entity) != null) {
             switch (event.getCause()) {
                 case CUSTOM:
                     // do nothing
@@ -44,7 +27,7 @@ public class MyListener implements Listener {
                 case FALL:
                     // player fall damage
                     if (entity instanceof Player) {
-                        PlayerStats stats = PlayerStats.extractFromEntity(entity);
+                        Stats stats = Stats.extractFromEntity(entity);
                         if (stats != null) {
                             if (event.getDamage() > 3) {
                                 stats.damagePercent(2.5 * (event.getDamage() - 3));
@@ -62,8 +45,8 @@ public class MyListener implements Listener {
     public void onEntityDamageEntity(EntityDamageByEntityEvent event) {
         Entity damager = event.getDamager();
         Entity damagee = event.getEntity();
-        PlayerStats damagerStat = PlayerStats.extractFromEntity(damager);
-        PlayerStats damageeStat = PlayerStats.extractFromEntity(damagee);
+        Stats damagerStat = Stats.extractFromEntity(damager);
+        Stats damageeStat = Stats.extractFromEntity(damagee);
         if (damagerStat == null || damageeStat == null) {
             return;
         }
@@ -79,7 +62,7 @@ public class MyListener implements Listener {
     @EventHandler
     public void onInteract(PlayerInteractEntityEvent event) {
         Entity entity = event.getRightClicked();
-        PlayerStats stats = PlayerStats.extractFromEntity(entity);
+        Stats stats = Stats.extractFromEntity(entity);
         if (stats != null) {
             event.setCancelled(true);
             if (event.getHand() == EquipmentSlot.HAND) {

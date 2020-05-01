@@ -1,6 +1,6 @@
 package me.lkp111138.plugin.command;
 
-import me.lkp111138.plugin.model.CustomItem;
+import me.lkp111138.plugin.item.CustomItem;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,10 +18,10 @@ public class CommandCustomItem implements CommandExecutor {
             if (item != null) {
                 ((Player) sender).getInventory().addItem(item.getItemStack());
             } else {
-                sender.sendMessage("\u00a7cNo such item: " + args[0]);
+                sender.sendMessage("\u00a7cNo such me.lkp111138.plugin.item: " + args[0]);
             }
         } else {
-            System.out.println("Cannot give item to console");
+            System.out.println("Cannot give me.lkp111138.plugin.item to console");
         }
         return true;
     }

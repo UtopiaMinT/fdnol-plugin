@@ -1,4 +1,4 @@
-package me.lkp111138.plugin.model;
+package me.lkp111138.plugin.rpg;
 
 import me.lkp111138.plugin.Main;
 import org.bukkit.Location;
@@ -37,7 +37,7 @@ public class CustomMob {
     public Entity spawnNew(Location location) {
         World world = location.getWorld();
         Entity entity = world.spawnEntity(location, type);
-        PlayerStats stats = new PlayerStats();
+        Stats stats = new Stats();
         stats.setMaxHealth(health);
         stats.fullHeal();
         stats.setDamage(damage);

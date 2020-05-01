@@ -233,11 +233,11 @@ public class NPC {
         this.trackingEntity = trackingEntity;
     }
 
-    static List<NPC> getActiveNPCList() {
+    public static List<NPC> getActiveNPCList() {
         return activeNPCList;
     }
 
-    Entity getVillager() {
+    public Entity getVillager() {
         return villager;
     }
 

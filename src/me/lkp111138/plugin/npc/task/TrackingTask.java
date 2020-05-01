@@ -1,5 +1,6 @@
-package me.lkp111138.plugin.npc;
+package me.lkp111138.plugin.npc.task;
 
+import me.lkp111138.plugin.npc.NPC;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;

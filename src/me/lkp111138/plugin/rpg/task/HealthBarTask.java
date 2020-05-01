@@ -1,6 +1,6 @@
-package me.lkp111138.plugin.task;
+package me.lkp111138.plugin.rpg.task;
 
-import me.lkp111138.plugin.model.PlayerStats;
+import me.lkp111138.plugin.rpg.Stats;
 import net.minecraft.server.v1_12_R1.ChatMessageType;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 import net.minecraft.server.v1_12_R1.PacketPlayOutChat;
@@ -20,7 +20,7 @@ public class HealthBarTask implements Runnable {
         entities.forEach(_entity -> {
             if (_entity instanceof LivingEntity) {
                 LivingEntity entity = (LivingEntity) _entity;
-                PlayerStats stats = PlayerStats.extractFromEntity(entity);
+                Stats stats = Stats.extractFromEntity(entity);
                 if (stats != null) {
                     if (entity instanceof Player) {
                         entity.setHealth(stats.getHealthHalfHearts());

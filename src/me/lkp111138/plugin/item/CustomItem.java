@@ -1,8 +1,7 @@
-package me.lkp111138.plugin.model;
+package me.lkp111138.plugin.item;
 
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NBTTagInt;
-import net.minecraft.server.v1_12_R1.NBTTagList;
 import net.minecraft.server.v1_12_R1.NBTTagString;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;

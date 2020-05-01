@@ -4,18 +4,17 @@ import me.lkp111138.plugin.command.CommandCustomItem;
 import me.lkp111138.plugin.command.CommandCustomMob;
 import me.lkp111138.plugin.command.CommandNpc;
 import me.lkp111138.plugin.command.CommandTest;
-import me.lkp111138.plugin.listener.MyListener;
-import me.lkp111138.plugin.model.CustomItem;
-import me.lkp111138.plugin.model.CustomMob;
+import me.lkp111138.plugin.item.CustomItem;
+import me.lkp111138.plugin.rpg.CustomMob;
+import me.lkp111138.plugin.rpg.CustomMobEventListener;
 import me.lkp111138.plugin.npc.NPC;
 import me.lkp111138.plugin.npc.NPCEventListener;
-import me.lkp111138.plugin.npc.TrackingTask;
-import me.lkp111138.plugin.task.HealthBarTask;
+import me.lkp111138.plugin.npc.task.TrackingTask;
+import me.lkp111138.plugin.rpg.task.HealthBarTask;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,12 +39,12 @@ public class Main extends JavaPlugin {
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new TrackingTask(), 0, 5);
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new HealthBarTask(), 0, 2);
         // custom items
-        ConfigurationSection itemSection = config.getConfigurationSection("item");
+        ConfigurationSection itemSection = config.getConfigurationSection("me/lkp111138/plugin/item");
         for (String key : itemSection.getKeys(false)) {
             new CustomItem(key, itemSection.getConfigurationSection(key));
         }
         // custom mobs
-        ConfigurationSection mobSection = config.getConfigurationSection("mob");
+        ConfigurationSection mobSection = config.getConfigurationSection("rpg");
         for (String key : mobSection.getKeys(false)) {
             new CustomMob(key, mobSection.getConfigurationSection(key));
         }
@@ -57,13 +56,12 @@ public class Main extends JavaPlugin {
         this.getCommand("custommob").setExecutor(new CommandCustomMob());
         this.getServer().getPluginManager().registerEvents(new MyListener(), this);
         this.getServer().getPluginManager().registerEvents(new NPCEventListener(), this);
+        this.getServer().getPluginManager().registerEvents(new CustomMobEventListener(), this);
     }
 
     @Override
     public void onDisable() {
         NPC.removeAll();
-        System.out.println(getConfig().getKeys(false));
-        System.out.println(getConfig().getConfigurationSection("item"));
         instance = null;
     }
 
