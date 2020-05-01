@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -31,16 +32,28 @@ public class MyListener implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
         Entity entity = event.getEntity();
-        event.setCancelled(PlayerStats.extractFromEntity(entity) != null && event.getDamage() < 100);
-        // player fall damage
-        if (event.getCause() == EntityDamageEvent.DamageCause.FALL) {
-            if (entity instanceof Player) {
-                PlayerStats stats = PlayerStats.extractFromEntity(entity);
-                if (stats != null) {
-                    if (event.getDamage() > 3) {
-                        stats.damagePercent(2.5 * (event.getDamage() - 3));
+        if (PlayerStats.extractFromEntity(entity) != null) {
+            switch (event.getCause()) {
+                case CUSTOM:
+                    // do nothing
+                    entity.setLastDamageCause(null);
+                    break;
+                case ENTITY_ATTACK:
+                    event.setDamage(0.00001); // so that we still get knockback
+                    break;
+                case FALL:
+                    // player fall damage
+                    if (entity instanceof Player) {
+                        PlayerStats stats = PlayerStats.extractFromEntity(entity);
+                        if (stats != null) {
+                            if (event.getDamage() > 3) {
+                                stats.damagePercent(2.5 * (event.getDamage() - 3));
+                            }
+                        }
                     }
-                }
+                default:
+                    // cancel all others
+                    event.setCancelled(true);
             }
         }
     }
@@ -73,5 +86,10 @@ public class MyListener implements Listener {
                 event.getPlayer().sendMessage(String.valueOf(stats.getHealth()));
             }
         }
+    }
+
+    @EventHandler
+    public void onMobDeath(EntityDeathEvent e) {
+        e.setDroppedExp(0);
     }
 }
