@@ -20,7 +20,7 @@ public class CustomMobEventListener implements Listener {
                     entity.setLastDamageCause(null);
                     break;
                 case ENTITY_ATTACK:
-                    event.setDamage(0.00001); // so that we still get knockback
+                    event.setDamage(0.00000); // so that we still get knockback
                     break;
                 case FALL:
                     // player fall damage
@@ -48,10 +48,17 @@ public class CustomMobEventListener implements Listener {
         if (damagerStat == null || damageeStat == null) {
             return;
         }
-        if (!damageeStat.damage(damagerStat.getDamage())) {
+        if (true) {
             if (damagee instanceof LivingEntity) {
+                double damageInHalfHearts = damageeStat.damage(damagerStat.getDamage());
                 if (!(damagee instanceof Player)) {
-                    ((LivingEntity) damagee).damage(999999);
+                    if (damageeStat.getHealth() > 0) {
+                        ((LivingEntity) damagee).damage(0.0001);
+                    } else {
+                        ((LivingEntity) damagee).damage(999999);
+                    }
+                } else {
+                    ((LivingEntity) damagee).damage(damageInHalfHearts);
                 }
             }
         }
