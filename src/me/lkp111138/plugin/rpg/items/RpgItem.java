@@ -1,5 +1,6 @@
 package me.lkp111138.plugin.rpg.items;
 
+import me.lkp111138.plugin.Util;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NBTTagInt;
 import net.minecraft.server.v1_12_R1.NBTTagString;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class RpgItem {
     private static int positiveMax;
@@ -116,8 +116,19 @@ public class RpgItem {
         this.texture = section.getString("texture");
         this.color = section.getString("color");
         this.tier = section.getString("tier");
-        this.lore = section.getStringList("lore").stream().map(x -> "\u00a7r" + x).collect(Collectors.toList());
-
+        String[] lore = section.getString("lore").split(" ");
+        this.lore = new ArrayList<>();
+        StringBuilder line = new StringBuilder("\u00a78").append(lore[0]);
+        for (int i = 1; i < lore.length; i++) {
+            String word = lore[i];
+            if (line.length() + 1 + word.length() < 33) {
+                line.append(" ").append(word);
+            } else {
+                this.lore.add(line.toString());
+                line.setLength(2);
+                line.append(word);
+            }
+        }
         registry.put(id, this);
     }
 
@@ -131,7 +142,6 @@ public class RpgItem {
         NBTTagCompound rpg = compound.getCompound("RPG");
         if (rpg != null) {
             String itemId = rpg.getString("ITEM_ID");
-            System.out.println(itemId);
             if (registry.containsKey(itemId)) {
                 return registry.get(itemId).fixItemInternal(itemStack);
             }
@@ -172,7 +182,9 @@ public class RpgItem {
         // todo req
         // todo bonus
 
-
+        lore.add("");
+        lore.addAll(this.lore);
+        lore.add(tierPrefix.get(tier) + Util.capitalize(tier) + " Item");
         ItemMeta meta = itemStack.getItemMeta();
         meta.setLore(lore);
         itemStack.setItemMeta(meta);
@@ -237,7 +249,6 @@ public class RpgItem {
             leatherMeta.setColor(Color.fromRGB(color));
         }
         meta.setDisplayName(tierPrefix.get(tier) + name);
-        meta.setLore(lore);
         itemStack.setItemMeta(meta);
         return itemStack;
     }

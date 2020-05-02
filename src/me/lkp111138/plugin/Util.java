@@ -1,6 +1,5 @@
 package me.lkp111138.plugin;
 
-import me.lkp111138.plugin.rpg.Stats;
 import net.minecraft.server.v1_12_R1.ChatMessageType;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 import net.minecraft.server.v1_12_R1.PacketPlayOutChat;
@@ -81,7 +80,7 @@ public class Util {
         return new UUID(high, low);
     }
 
-    public static void savePlayerStats(Stats stats) {
-
+    public static String capitalize(String s) {
+        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
     }
 }

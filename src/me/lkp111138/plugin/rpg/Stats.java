@@ -253,7 +253,6 @@ public class Stats {
             this.intelligenceSkill += intelligenceSkill;
             this.freeSkill -= total;
             double speedAttribute = baseSpeed * (100 + SKILL_TABLE[this.speedSkill]) / 100;
-            System.out.println(speedAttribute);
             if (entity instanceof Player) {
                 ((Player) entity).setWalkSpeed((float) speedAttribute);
             }
