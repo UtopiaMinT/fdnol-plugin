@@ -15,7 +15,7 @@ commands:
       - ci
   npc:
     description: "Info about NPCs"
-    usage: "\u00a7cUsage: /npc <subcommand> [args...]"
+    usage: "\u00a7cUsage: /npc <get|set> [args...]"
   custommob:
     description: "Spawns a custom mob"
     usage: "\u00a7cUsage: /custommob spawn MOB_ID"
@@ -31,3 +31,8 @@ commands:
     usage: "\u00a7cUsage: /skills"
     aliases:
       - skill
+  rpgitem:
+    description: "Allocates skills"
+    usage: "\u00a7cUsage: /rpgitem <give|fix> [args...]"
+    aliases:
+      - ri

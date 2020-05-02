@@ -7,8 +7,10 @@ import me.lkp111138.plugin.item.CustomItem;
 import me.lkp111138.plugin.npc.NPC;
 import me.lkp111138.plugin.npc.NPCEventListener;
 import me.lkp111138.plugin.npc.task.TrackingTask;
-import me.lkp111138.plugin.rpg.CustomMob;
-import me.lkp111138.plugin.rpg.CustomMobEventListener;
+import me.lkp111138.plugin.rpg.items.RpgItem;
+import me.lkp111138.plugin.rpg.items.RpgItemEventListener;
+import me.lkp111138.plugin.rpg.mob.CustomMob;
+import me.lkp111138.plugin.rpg.mob.CustomMobEventListener;
 import me.lkp111138.plugin.rpg.task.HealthBarTask;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -61,6 +63,13 @@ public class Main extends JavaPlugin {
         for (String key : mobSection.getKeys(false)) {
             new CustomMob(key, mobSection.getConfigurationSection(key));
         }
+        // rpi items
+        FileConfiguration rpgItemConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "rpgitems.yml"));
+        RpgItem.init(rpgItemConfig.getConfigurationSection("config"));
+        ConfigurationSection rpgItemSection = rpgItemConfig.getConfigurationSection("rpgitems");
+        for (String key : rpgItemSection.getKeys(false)) {
+            new RpgItem(key, rpgItemSection.getConfigurationSection(key));
+        }
         saveConfig();
 
         // repeating tasks
@@ -74,12 +83,14 @@ public class Main extends JavaPlugin {
         this.getCommand("custommob").setExecutor(new CommandCustomMob());
         this.getCommand("chestgui").setExecutor(new CommandChestGui());
         this.getCommand("skills").setExecutor(new CommandSkills());
+        this.getCommand("rpgitem").setExecutor(new CommandRpgItem());
 
         // module listeners
         this.getServer().getPluginManager().registerEvents(new MyListener(), this);
         this.getServer().getPluginManager().registerEvents(new NPCEventListener(), this);
         this.getServer().getPluginManager().registerEvents(new CustomMobEventListener(), this);
         this.getServer().getPluginManager().registerEvents(new ChestGuiEventListener(), this);
+        this.getServer().getPluginManager().registerEvents(new RpgItemEventListener(), this);
     }
 
     @Override

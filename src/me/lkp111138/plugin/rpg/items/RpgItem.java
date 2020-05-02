@@ -2,6 +2,7 @@ package me.lkp111138.plugin.rpg.items;
 
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NBTTagInt;
+import net.minecraft.server.v1_12_R1.NBTTagString;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class RpgItem {
     private static int positiveMax;
@@ -21,6 +23,7 @@ public class RpgItem {
     private static int negativeMax;
     private static int negativeMin;
     private static Map<String, String> tierPrefix = new HashMap<>();
+    private static Map<String, RpgItem> registry = new HashMap<>();
 
     // requirements
     private final int reqPower;
@@ -113,7 +116,67 @@ public class RpgItem {
         this.texture = section.getString("texture");
         this.color = section.getString("color");
         this.tier = section.getString("tier");
-        this.lore = section.getStringList("lore");
+        this.lore = section.getStringList("lore").stream().map(x -> "\u00a7r" + x).collect(Collectors.toList());
+
+        registry.put(id, this);
+    }
+
+    public static RpgItem get(String id) {
+        return registry.get(id);
+    }
+
+    public static ItemStack fixItem(ItemStack itemStack) {
+        net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+        NBTTagCompound compound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
+        NBTTagCompound rpg = compound.getCompound("RPG");
+        if (rpg != null) {
+            String itemId = rpg.getString("ITEM_ID");
+            System.out.println(itemId);
+            if (registry.containsKey(itemId)) {
+                return registry.get(itemId).fixItemInternal(itemStack);
+            }
+        }
+        return null;
+    }
+
+    private ItemStack fixItemInternal(ItemStack itemStack) {
+        // stage 2: show stats on item
+        List<String> lore = new ArrayList<>();
+        // base stats
+        lore.add("\u00a7r\u00a74HP " + nToString(baseHealth));
+        if (baseEarthDefense != 0) {
+            lore.add("§r§2Earth defense §7" + nToString(baseEarthDefense));
+        }
+        if (baseFireDefense != 0) {
+            lore.add("§r§cFire defense §7" + nToString(baseFireDefense));
+        }
+        if (baseWindDefense != 0) {
+            lore.add("§r§7Wind defense §7" + nToString(baseWindDefense));
+        }
+        if (baseWaterDefense != 0) {
+            lore.add("§r§bWater defense §7" + nToString(baseWaterDefense));
+        }
+        if (baseBonusPower != 0) {
+            lore.add(nToString(baseBonusPower, true) + "\u00a77 Power");
+        }
+        if (baseBonusDefense != 0) {
+            lore.add(nToString(baseBonusDefense, true) + "\u00a77 Defense");
+        }
+        if (baseBonusSpeed != 0) {
+            lore.add(nToString(baseBonusSpeed, true) + "\u00a77 Speed");
+        }
+        if (baseBonusIntelligence != 0) {
+            lore.add(nToString(baseBonusIntelligence, true) + "\u00a77 Intelligence");
+        }
+
+        // todo req
+        // todo bonus
+
+
+        ItemMeta meta = itemStack.getItemMeta();
+        meta.setLore(lore);
+        itemStack.setItemMeta(meta);
+        return itemStack;
     }
 
     public ItemStack roll() {
@@ -135,20 +198,13 @@ public class RpgItem {
         rpg.set("healthRegen", new NBTTagInt(getRollFor(bonusHealthRegen)));
         rpg.set("health", new NBTTagInt(getRollFor(bonusHealth)));
         rpg.set("walkSpeed", new NBTTagInt(getRollFor(bonusWalkSpeed)));
+        rpg.set("ITEM_ID", new NBTTagString(id));
         compound.set("RPG", rpg);
+        compound.set("HideFlags", new NBTTagInt(63));
         nmsStack.setTag(compound);
         itemStack = CraftItemStack.asBukkitCopy(nmsStack);
-        // stage 2: show stats on item
-        List<String> lore = new ArrayList<>();
-        // base stats
-        lore.add("\u00a74HP " + nToString(baseHealth));
 
-
-
-        ItemMeta meta = itemStack.getItemMeta();
-        meta.setLore(lore);
-        itemStack.setItemMeta(meta);
-        return itemStack;
+        return fixItemInternal(itemStack);
     }
 
     private int getRollFor(int value) {
@@ -159,12 +215,16 @@ public class RpgItem {
         }
     }
 
-    private String nToString(int n) {
+    private String nToString(int n, boolean color) {
         if (n > 0) {
-            return "+" + n;
+            return (color ? "\u00a7a" : "") + "+" + n;
         } else {
-            return "" + n;
+            return (color ? "\u00a7c" : "") + n;
         }
+    }
+
+    private String nToString(int n) {
+        return nToString(n, false);
     }
 
     private ItemStack getItem() {
