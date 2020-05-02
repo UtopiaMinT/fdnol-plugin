@@ -16,7 +16,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 
-import java.util.Random;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.UUID;
 
 public class Stats {
     private static final double K = 0.261648041296;
@@ -76,8 +79,8 @@ public class Stats {
     };
 
     private final Entity entity;
-    private final Random random = new Random();
     private double baseSpeed;
+    private UUID uuid;
 
     // base defenses
     private double health;
@@ -112,8 +115,10 @@ public class Stats {
 
     public Stats(Entity entity) {
         this.entity = entity;
-        if (entity instanceof Player)
-        this.baseSpeed = ((Player) entity).getWalkSpeed();
+        if (entity instanceof Player) {
+            this.baseSpeed = ((Player) entity).getWalkSpeed();
+            this.uuid = entity.getUniqueId();
+        }
     }
 
     public void tick(Location entityLoc) {
@@ -224,7 +229,7 @@ public class Stats {
         return amount / maxHealth * maxHearts * 2;
     }
 
-    public void addXP(int amount) {
+    public void addXP(long amount) {
         totalXP += amount;
         levelXP += amount;
         while (level < XP_TABLE.length && levelXP >= XP_TABLE[level]) {
@@ -302,8 +307,17 @@ public class Stats {
     }
 
     public ElementalDamage getDamage() {
-        // TODO strength
-        return damage.getDamage();
+        ElementalDamage damage = this.damage.getDamage();
+        damage.earth *= (100 + SKILL_TABLE[powerSkill] + SKILL_TABLE[powerSkill]) / 100;
+        damage.water *= (100 + SKILL_TABLE[powerSkill] + SKILL_TABLE[intelligenceSkill]) / 100;
+        damage.wind *= (100 + SKILL_TABLE[powerSkill] + SKILL_TABLE[speedSkill]) / 100;
+        damage.fire *= (100 + SKILL_TABLE[powerSkill] + SKILL_TABLE[defenseSkill]) / 100;
+        damage.neutral *= (100 + SKILL_TABLE[powerSkill]) / 100;
+        return damage;
+    }
+
+    public long getTotalXP() {
+        return totalXP;
     }
 
     public int getPowerSkill() {
@@ -324,6 +338,10 @@ public class Stats {
 
     public int getFreeSkill() {
         return freeSkill;
+    }
+
+    public int getLevel() {
+        return level;
     }
 
     public void setHealthRegen(double healthRegen) {
@@ -347,6 +365,10 @@ public class Stats {
         this.elementalDefense = elementalDefense;
     }
 
+    public void setDeaths(int deaths) {
+        this.deaths = deaths;
+    }
+
     public static Stats extractFromEntity(Entity entity) {
         for (MetadataValue value : entity.getMetadata("rpg")) {
             if (value.getOwningPlugin().equals(Main.getInstance())) {
@@ -354,5 +376,23 @@ public class Stats {
             }
         }
         return null;
+    }
+
+    public void save() throws SQLException{
+        try (Connection conn = Main.getInstance().getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement("REPLACE INTO player_stats (uuid, username, power_skill, defense_skill, speed_skill, intel_skill, free_skill, total_xp, deaths, health) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            stmt.setBytes(1, Util.getBytesFromUUID(uuid));
+            stmt.setString(2, entity.getName());
+            stmt.setInt(3, powerSkill);
+            stmt.setInt(4, defenseSkill);
+            stmt.setInt(5, speedSkill);
+            stmt.setInt(6, intelligenceSkill);
+            stmt.setInt(7, freeSkill);
+            stmt.setLong(8, totalXP);
+            stmt.setInt(9, deaths);
+            stmt.setDouble(10, health);
+            stmt.execute();
+            stmt.close();
+        }
     }
 }

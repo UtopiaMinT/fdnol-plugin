@@ -1,5 +1,6 @@
 package me.lkp111138.plugin;
 
+import me.lkp111138.plugin.rpg.Stats;
 import net.minecraft.server.v1_12_R1.ChatMessageType;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 import net.minecraft.server.v1_12_R1.PacketPlayOutChat;
@@ -7,6 +8,8 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.util.UUID;
 
 public class Util {
     public static int digitCount(int i) {
@@ -60,5 +63,25 @@ public class Util {
         IChatBaseComponent cbc = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}");
         PacketPlayOutChat ppoc = new PacketPlayOutChat(cbc, ChatMessageType.GAME_INFO);
         ((CraftPlayer)player).getHandle().playerConnection.sendPacket(ppoc);
+    }
+
+    public static byte[] getBytesFromUUID(UUID uuid) {
+        ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
+        bb.putLong(uuid.getMostSignificantBits());
+        bb.putLong(uuid.getLeastSignificantBits());
+
+        return bb.array();
+    }
+
+    public static UUID getUUIDFromBytes(byte[] bytes) {
+        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
+        long high = byteBuffer.getLong();
+        long low = byteBuffer.getLong();
+
+        return new UUID(high, low);
+    }
+
+    public static void savePlayerStats(Stats stats) {
+
     }
 }
