@@ -1,6 +1,7 @@
-package me.lkp111138.plugin.rpg;
+package me.lkp111138.plugin.rpg.mob;
 
 import me.lkp111138.plugin.Main;
+import me.lkp111138.plugin.rpg.Stats;
 import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import me.lkp111138.plugin.rpg.defense.ElementalDefense;
 import org.bukkit.Location;

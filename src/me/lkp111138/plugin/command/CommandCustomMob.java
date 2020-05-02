@@ -1,7 +1,7 @@
 package me.lkp111138.plugin.command;
 
-import me.lkp111138.plugin.rpg.CustomMob;
 import me.lkp111138.plugin.npc.NPC;
+import me.lkp111138.plugin.rpg.mob.CustomMob;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

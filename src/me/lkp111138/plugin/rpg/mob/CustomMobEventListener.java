@@ -1,5 +1,6 @@
-package me.lkp111138.plugin.rpg;
+package me.lkp111138.plugin.rpg.mob;
 
+import me.lkp111138.plugin.rpg.Stats;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
