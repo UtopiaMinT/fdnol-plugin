@@ -2,6 +2,7 @@ package me.lkp111138.plugin;
 
 import me.lkp111138.plugin.chestgui.ChestGuiEventListener;
 import me.lkp111138.plugin.command.*;
+import me.lkp111138.plugin.database.ConnectionPool;
 import me.lkp111138.plugin.item.CustomItem;
 import me.lkp111138.plugin.npc.NPC;
 import me.lkp111138.plugin.npc.NPCEventListener;
@@ -15,12 +16,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 public class Main extends JavaPlugin {
-
     private static Main instance;
+    private ConnectionPool pool;
 
     @Override
     public void onEnable() {
@@ -28,6 +31,15 @@ public class Main extends JavaPlugin {
 
         FileConfiguration config = this.getConfig();
         config.set("cute", true);
+        String connString = String.format("jdbc:mysql://%s/%s?user=%s&password=%s&useSSL=false", config.get("db.host"), config.get("db.name"), config.get("db.user"), config.get("db.pass"));
+        try {
+            pool = new ConnectionPool(connString, 3, 10);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // database init much succeed, or die
+            getServer().shutdown();
+            return;
+        }
         // npc
         FileConfiguration npcConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "npc.yml"));
         List<Map<?, ?>> npcSection = npcConfig.getMapList("npc");
@@ -73,10 +85,21 @@ public class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         NPC.removeAll();
+        // save all stats
+        new HealthBarTask(true).run();
+        if (pool != null) {
+            // if we failed to initialize the pool, this won't run
+            pool.shutdown();
+            pool = null;
+        }
         instance = null;
     }
 
     public static Main getInstance() {
         return instance;
+    }
+
+    public Connection getConnection() throws SQLException {
+        return pool.getConnection();
     }
 }
