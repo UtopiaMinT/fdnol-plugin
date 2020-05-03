@@ -3,6 +3,7 @@ package me.lkp111138.plugin;
 import me.lkp111138.plugin.rpg.Stats;
 import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import me.lkp111138.plugin.rpg.defense.ElementalDefense;
+import me.lkp111138.plugin.rpg.items.RpgItem;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -54,8 +55,12 @@ public class MyListener implements Listener {
                     Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
                         stats.addXP(totalXP);
                         stats.setMaxHealth(100 + 10 * stats.getLevel());
-                        stats.heal(health);
                         stats.allocate(power, defense, speed, intelligence);
+                        System.out.println(stats.equip(RpgItem.fixItem(joined.getInventory().getHelmet()), "helmet"));
+                        System.out.println(stats.equip(RpgItem.fixItem(joined.getInventory().getChestplate()), "chestplate"));
+                        System.out.println(stats.equip(RpgItem.fixItem(joined.getInventory().getLeggings()), "leggings"));
+                        System.out.println(stats.equip(RpgItem.fixItem(joined.getInventory().getBoots()), "boots"));
+                        stats.heal(health);
                         stats.setHealthRegen(1.2);
                         ElementalDamageRange range = new ElementalDamageRange();
                         range.minNeutral = 20;

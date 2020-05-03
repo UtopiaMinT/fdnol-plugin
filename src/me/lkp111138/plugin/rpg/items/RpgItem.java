@@ -188,6 +188,21 @@ public class RpgItem {
         }
 
         // todo req
+        if (reqLevel > 0) {
+            lore.add("\u00a77Min Level: " + reqLevel);
+        }
+        if (reqPower > 0) {
+            lore.add("\u00a77Min Power: " + reqPower);
+        }
+        if (reqDefense > 0) {
+            lore.add("\u00a77Min Defense: " + reqDefense);
+        }
+        if (reqSpeed > 0) {
+            lore.add("\u00a77Min Speed: " + reqSpeed);
+        }
+        if (reqIntelligence > 0) {
+            lore.add("\u00a77Min Intelligence: " + reqIntelligence);
+        }
         // todo bonus
 
         lore.add("");
@@ -195,7 +210,9 @@ public class RpgItem {
         lore.add(tierPrefix.get(tier) + Util.capitalize(tier) + " Item");
         ItemMeta meta = itemStack.getItemMeta();
         meta.setLore(lore);
+        meta.setUnbreakable(true);
         itemStack.setItemMeta(meta);
+        itemStack.setDurability((short) 0);
         return itemStack;
     }
 
