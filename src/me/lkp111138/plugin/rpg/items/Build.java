@@ -9,7 +9,8 @@ public class Build {
     private ItemStack chestplate;
     private ItemStack leggings;
     private ItemStack boots;
-    
+    private ItemStack weapon;
+
     // base
     private int baseBonusPower;
     private int baseBonusDefense;
@@ -97,6 +98,22 @@ public class Build {
             this.boots = boots.clone();
         } else {
             this.boots = null;
+        }
+    }
+
+    public ItemStack getWeapon() {
+        return weapon;
+    }
+
+    public void setWeapon(ItemStack weapon) {
+        if (this.weapon != null) {
+            adjustStats(this.weapon, -1);
+        }
+        if (weapon != null) {
+            adjustStats(weapon, 1);
+            this.weapon = weapon.clone();
+        } else {
+            this.weapon = null;
         }
     }
 
