@@ -1,6 +1,7 @@
 package me.lkp111138.plugin.rpg.items;
 
 import me.lkp111138.plugin.rpg.Stats;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,32 +29,45 @@ public class RpgItemEventListener implements Listener {
             boolean container = event.getSlotType() == InventoryType.SlotType.CONTAINER;
             boolean armour = event.getSlotType() == InventoryType.SlotType.ARMOR;
 
-            System.out.println(event.getCurrentItem());
-            System.out.println(event.getCursor());
-            System.out.println(event.getSlotType());
-            System.out.println(event.getClick());
+            System.out.println("currentItem: " + event.getCurrentItem().getType());
+            System.out.println("cursor: " + event.getCursor().getType());
+            System.out.println("slot 0: " + event.getClickedInventory().getItem(0));
+            System.out.println("slot slot: " + event.getClickedInventory().getItem(event.getSlot()));
+//            System.out.println("slot rawSlot: " + event.getClickedInventory().getItem(event.getRawSlot()));
+            System.out.println("slot: " + event.getSlot());
+            System.out.println("rawSlot: " + event.getRawSlot());
+            System.out.println("slotType: " + event.getSlotType());
+            System.out.println("click: " + event.getClick());
             // TODO handle unequip
             if (isArmour(event.getCurrentItem())) {
                 if (shift) {
                     if (quickBar || container) {
                         // shift click
-                        event.setCancelled(onEquip(player, event.getCurrentItem()));
+                        event.setCancelled(onEquip(player, event.getCurrentItem(), armourType(event.getCurrentItem())));
                         return;
                     }
+                    if (armour) {
+                        // shift click
+                        event.setCancelled(onEquip(player, null, Stats.SLOTS_REVERSE.get(event.getRawSlot())));
+                    }
+                }
+                if (armour && mouse) {
+                    // manual unequip
+                    event.setCancelled(onEquip(player, null, Stats.SLOTS_REVERSE.get(event.getRawSlot())));
                 }
             }
             if (isArmour(event.getCursor())) {
                 if (mouse) {
                     if (armour) {
                         // manual place
-                        event.setCancelled(onEquip(player, event.getCurrentItem()));
+                        event.setCancelled(onEquip(player, event.getCursor(), armourType(event.getCursor())));
                         return;
                     }
                 }
             }
             if (num && armour) {
                 // hotbar swap
-                event.setCancelled(onEquip(player, event.getCurrentItem()));
+                event.setCancelled(onEquip(player, event.getClickedInventory().getItem(event.getHotbarButton()), armourType(event.getRawSlot())));
             }
         }
     }
@@ -63,9 +77,9 @@ public class RpgItemEventListener implements Listener {
         HumanEntity whoClicked = event.getWhoClicked();
         boolean armour = isArmour(event.getNewItems().get(5)) || isArmour(event.getNewItems().get(6)) || isArmour(event.getNewItems().get(7)) || isArmour(event.getNewItems().get(8));
         if (whoClicked instanceof Player) {
-            Player player = (Player) whoClicked;
             if (armour) {
-                event.setCancelled(onEquip(player, event.getCursor()));
+                // just disallow
+                event.setCancelled(true);
             }
         }
     }
@@ -73,19 +87,23 @@ public class RpgItemEventListener implements Listener {
     @EventHandler
     public void onHotbarRightClick(PlayerInteractEvent event) {
         if (isArmour(event.getItem()) && ((event.getAction() == Action.RIGHT_CLICK_AIR) || (event.getAction() == Action.RIGHT_CLICK_BLOCK))) {
-            event.setCancelled(onEquip(event.getPlayer(), event.getItem()));
+            event.setCancelled(onEquip(event.getPlayer(), event.getItem(), armourType(event.getItem())));
         }
     }
 
-    private boolean onEquip(Player player, ItemStack item) {
+    private boolean onEquip(Player player, ItemStack item, String slot) {
         Stats stats = Stats.extractFromEntity(player);
         if (stats == null) {
             return true;
         }
-        String error = stats.equip(item);
-        if (error != null) {
-            player.sendMessage("\u00a7c" + error);
-            return true;
+        if (item == null || item.getType() == Material.AIR) {
+            stats.unequip(slot);
+        } else {
+            String error = stats.equip(item, slot);
+            if (error != null) {
+                player.sendMessage("\u00a7c" + error);
+                return true;
+            }
         }
         return false;
     }
@@ -118,6 +136,55 @@ public class RpgItemEventListener implements Listener {
                 return true;
             default:
                 return false;
+        }
+    }
+
+    private String armourType(ItemStack item) {
+        if (item == null) {
+            return null;
+        }
+        switch (item.getType()) {
+            case LEATHER_HELMET:
+            case CHAINMAIL_HELMET:
+            case GOLD_HELMET:
+            case IRON_HELMET:
+            case DIAMOND_HELMET:
+                return "helmet";
+            case LEATHER_CHESTPLATE:
+            case CHAINMAIL_CHESTPLATE:
+            case GOLD_CHESTPLATE:
+            case IRON_CHESTPLATE:
+            case DIAMOND_CHESTPLATE:
+                return "chestplate";
+            case LEATHER_LEGGINGS:
+            case CHAINMAIL_LEGGINGS:
+            case GOLD_LEGGINGS:
+            case IRON_LEGGINGS:
+            case DIAMOND_LEGGINGS:
+                return "leggings";
+            case LEATHER_BOOTS:
+            case CHAINMAIL_BOOTS:
+            case GOLD_BOOTS:
+            case IRON_BOOTS:
+            case DIAMOND_BOOTS:
+                return "boots";
+            default:
+                return null;
+        }
+    }
+
+    private String armourType(int rawSlot) {
+        switch (rawSlot) {
+            case 5:
+                return "helmet";
+            case 6:
+                return "chestplate";
+            case 7:
+                return "leggings";
+            case 8:
+                return "boots";
+            default:
+                return null;
         }
     }
 }

@@ -9,6 +9,7 @@ import me.lkp111138.plugin.rpg.items.Build;
 import me.lkp111138.plugin.rpg.items.RpgItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.ArmorStand;
@@ -16,13 +17,14 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.UUID;
+import java.util.*;
 
 public class Stats {
     // TODO apply items and apply bonuses
@@ -81,6 +83,18 @@ public class Stats {
             89.46, 89.55, 89.64, 89.72, 89.81, 89.89, 89.98, 90.06, 90.15, 90.23,
             90.31, 90.40, 90.48, 90.56, 90.64, 90.73, 90.81, 90.89, 90.97, 91.05
     };
+    public static Map<String, Integer> SLOTS = new HashMap<String, Integer>() {{
+        put("helmet", 5);
+        put("chestplate", 6);
+        put("leggings", 7);
+        put("boots", 8);
+    }};
+    public static Map<Integer, String> SLOTS_REVERSE = new HashMap<Integer, String>() {{
+        put(5, "helmet");
+        put(6, "chestplate");
+        put(7, "leggings");
+        put(8, "boots");
+    }};
 
     // owner of the stats
     private final Entity entity;
@@ -247,7 +261,10 @@ public class Stats {
         return effective;
     }
 
-    public String equip(ItemStack item) {
+    public String equip(ItemStack item, String slot) {
+        if (item == null || item.getType() == Material.AIR) {
+            return null;
+        }
         // check if its a valid item
         String itemId = RpgItem.getItemId(item);
         RpgItem rpgItem = RpgItem.get(itemId);
@@ -255,19 +272,19 @@ public class Stats {
             return "Invalid Item!";
         }
         // check of stats fulfilled
-        if (getEffectivePowerSkill() < rpgItem.reqLevel) {
+        if (level < rpgItem.reqLevel) {
             return String.format("%s requires your Level to be at least %s.", rpgItem.name, rpgItem.reqLevel);
         }
         if (getEffectivePowerSkill() < rpgItem.reqPower) {
             return String.format("%s requires your Power Skill to be at least %s.", rpgItem.name, rpgItem.reqPower);
         }
-        if (getEffectivePowerSkill() < rpgItem.reqIntelligence) {
+        if (getEffectiveIntelligenceSkill() < rpgItem.reqIntelligence) {
             return String.format("%s requires your Intelligence Skill to be at least %s.", rpgItem.name, rpgItem.reqIntelligence);
         }
-        if (getEffectivePowerSkill() < rpgItem.reqSpeed) {
+        if (getEffectiveSpeedSkill() < rpgItem.reqSpeed) {
             return String.format("%s requires your Speed Skill to be at least %s.", rpgItem.name, rpgItem.reqSpeed);
         }
-        if (getEffectivePowerSkill() < rpgItem.reqDefense) {
+        if (getEffectiveDefenseSkill() < rpgItem.reqDefense) {
             return String.format("%s requires your Defense Skill to be at least %s.", rpgItem.name, rpgItem.reqDefense);
         }
         // ok real equip
@@ -286,7 +303,53 @@ public class Stats {
                 break;
         }
         setMaxHealth(maxHealth);
+        if (entity instanceof Player) {
+            ((Player) entity).getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-20);
+        }
         return null;
+    }
+
+    public void unequip(String slot) {
+        // yes just reset the whole build ez
+        System.out.println("unequip " + slot);
+        HashMap<String, ItemStack> buildItems = new HashMap<>();
+        buildItems.put("helmet", build.getHelmet());
+        buildItems.put("chestplate", build.getChestplate());
+        buildItems.put("leggings", build.getLeggings());
+        buildItems.put("boots", build.getBoots());
+        buildItems.remove(slot);
+        buildItems.values().removeAll(Collections.singletonList(null));
+        build.setHelmet(null);
+        build.setChestplate(null);
+        build.setLeggings(null);
+        build.setBoots(null);
+        while (true) {
+            int count = 0;
+            for (Iterator<String> iterator = buildItems.keySet().iterator(); iterator.hasNext(); ) {
+                String key = iterator.next();
+                if (equip(buildItems.get(key), key) == null) {
+                    ++count;
+                    iterator.remove();
+                }
+            }
+            if (count == 0 || buildItems.isEmpty()) {
+                break;
+            }
+        }
+        for (String key : buildItems.keySet()) {
+            ItemStack item = buildItems.get(key);
+            String error = equip(item, key);
+            entity.sendMessage("\u00a7c" + error);
+            if (entity instanceof Player) {
+                Player player = (Player) entity;
+                PlayerInventory inv = player.getInventory();
+                if (inv.addItem(item).isEmpty()) {
+                    inv.setItem(SLOTS.get(key), new ItemStack(Material.AIR));
+                }
+            }
+        }
+        setMaxHealth(maxHealth);
+        heal(0);
     }
 
     public void addXP(long amount) {
