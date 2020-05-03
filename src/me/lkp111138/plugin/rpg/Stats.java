@@ -271,6 +271,11 @@ public class Stats {
         String itemId = RpgItem.getItemId(item);
         RpgItem rpgItem = RpgItem.get(itemId);
         if (itemId == null || rpgItem == null) {
+            if (slot.equals("weapon")) {
+                // you can use anything as a "weapon" it just deals no damage
+                unequip("weapon");
+                return null;
+            }
             return "Invalid Item!";
         }
         // check of stats fulfilled
