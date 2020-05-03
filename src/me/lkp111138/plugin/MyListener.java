@@ -5,19 +5,30 @@ import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import me.lkp111138.plugin.rpg.defense.ElementalDefense;
 import me.lkp111138.plugin.rpg.items.RpgItem;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 
 public class MyListener implements Listener {
     @EventHandler
@@ -91,6 +102,53 @@ public class MyListener implements Listener {
                 e.printStackTrace();
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerAttack(PlayerInteractEvent event) {
+        Player player = event.getPlayer();
+        if (event.getHand() != EquipmentSlot.HAND) {
+            return;
+        }
+        if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) {
+            return;
+        }
+        event.setCancelled(onPlayerAttack(player));
+    }
+
+    @EventHandler
+    public void onPlayerAttack(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        if (event.getHand() != EquipmentSlot.HAND) {
+            return;
+        }
+        event.setCancelled(onPlayerAttack(player));
+    }
+
+    private boolean onPlayerAttack(Player player) {
+        // all mobs within 3.5 blocks and a 30 degree cone
+        Location playerLoc = player.getLocation();
+        Vector playerVector = playerLoc.toVector();
+        Vector playerDirection = playerLoc.getDirection();
+        Collection<Entity> entities = player.getWorld().getNearbyEntities(playerLoc, 4, 4, 4);
+        boolean hit = false;
+        for (Entity entity : entities) {
+            if (entity == player || entity instanceof Villager) {
+                // lets not self harm
+                continue;
+            }
+            Vector entityLoc = entity.getLocation().toVector();
+            entityLoc.add(new Vector(0, entity.getHeight() / 2 - 0.9, 0));
+            Vector entityDirection = entityLoc.add(playerVector.multiply(-1)).normalize();
+            double crossProdSq = entityDirection.crossProduct(playerDirection).lengthSquared();
+            player.sendMessage(String.valueOf(crossProdSq));
+            if (crossProdSq < 0.25) { // sin 30deg = 0.5
+                EntityDamageByEntityEvent e = new EntityDamageByEntityEvent(player, entity, EntityDamageEvent.DamageCause.ENTITY_ATTACK, 1);
+                Bukkit.getPluginManager().callEvent(e);
+                hit = true;
+            }
+        }
+        return hit;
     }
 
     private void sendEquipErrorString(Player p, String s) {
