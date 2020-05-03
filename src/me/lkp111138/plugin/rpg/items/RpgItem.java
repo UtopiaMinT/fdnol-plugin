@@ -190,7 +190,6 @@ public class RpgItem {
             lore.add(nToString(baseBonusIntelligence, true) + "\u00a77 Intelligence");
         }
 
-        // todo req
         if (reqLevel > 0) {
             lore.add("\u00a77Min Level: " + reqLevel);
         }
@@ -206,8 +205,49 @@ public class RpgItem {
         if (reqIntelligence > 0) {
             lore.add("\u00a77Min Intelligence: " + reqIntelligence);
         }
-        // todo bonus
 
+        net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+        NBTTagCompound compound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
+        NBTTagCompound rpg = compound.getCompound("RPG");
+        if (bonusMeleePercent > 0) {
+            lore.add(nToString((int) (bonusMeleePercent * rpg.getInt("MeleePercent") / 100.0), true) + "% \u00a77Melee Damage");
+        }
+        if (bonusMeleeNeutral > 0) {
+            lore.add(nToString((int) (bonusMeleeNeutral * rpg.getInt("MeleeNeutral") / 100.0), true) + " \u00a77Melee Damage");
+        }
+        if (bonusEarthDefense > 0) {
+            lore.add(nToString((int) (bonusEarthDefense * rpg.getInt("EarthDefense") / 100.0), true) + "% \u00a77Earth Defense");
+        }
+        if (bonusFireDefense > 0) {
+            lore.add(nToString((int) (bonusFireDefense * rpg.getInt("FireDefense") / 100.0), true) + "% \u00a77Fire Defense");
+        }
+        if (bonusWindDefense > 0) {
+            lore.add(nToString((int) (bonusWindDefense * rpg.getInt("WindDefense") / 100.0), true) + "% \u00a77Wind Defense");
+        }
+        if (bonusWaterDefense > 0) {
+            lore.add(nToString((int) (bonusWaterDefense * rpg.getInt("WaterDefense") / 100.0), true) + "% \u00a77Water Defense");
+        }
+        if (bonusEarthDamage > 0) {
+            lore.add(nToString((int) (bonusEarthDamage * rpg.getInt("EarthDamage") / 100.0), true) + "% \u00a77Earth Damage");
+        }
+        if (bonusFireDamage > 0) {
+            lore.add(nToString((int) (bonusFireDamage * rpg.getInt("FireDamage") / 100.0), true) + "% \u00a77Fire Damage");
+        }
+        if (bonusWindDamage > 0) {
+            lore.add(nToString((int) (bonusWindDamage * rpg.getInt("WindDamage") / 100.0), true) + "% \u00a77Wind Damage");
+        }
+        if (bonusWaterDamage > 0) {
+            lore.add(nToString((int) (bonusWaterDamage * rpg.getInt("WaterDamage") / 100.0), true) + "% \u00a77Water Damage");
+        }
+        if (bonusHealthRegen > 0) {
+            lore.add(nToString((int) (bonusHealthRegen * rpg.getInt("HealthRegen") / 100.0), true) + " \u00a77Health Regen");
+        }
+        if (bonusHealth > 0) {
+            lore.add(nToString((int) (bonusHealth * rpg.getInt("Health") / 100.0), true) + " \u00a77Health");
+        }
+        if (bonusWalkSpeed > 0) {
+            lore.add(nToString((int) (bonusWalkSpeed * rpg.getInt("WalkSpeed") / 100.0), true) + "% \u00a77Walk Speed");
+        }
         lore.add("");
         lore.addAll(this.lore);
         lore.add(tierPrefix.get(tier) + Util.capitalize(tier) + " Item");
