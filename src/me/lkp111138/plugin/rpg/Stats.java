@@ -30,6 +30,7 @@ public class Stats {
     // TODO apply items and apply bonuses
     private static final double K = 0.261648041296;
     private static final double A = 1.79654388542;
+    private static final int MAX_LEVEL = 100;
     private static final int[] XP_TABLE = {
             80, 96, 115, 138, 165, 198, 236, 282, 336, 400,
             476, 566, 672, 797, 944, 1118, 1322, 1561, 1843, 2173,
@@ -188,7 +189,7 @@ public class Stats {
         }
         if (entity instanceof Player) {
             Player player = (Player) entity;
-            player.setExp((float) levelXP / XP_TABLE[level]);
+            player.setExp(level >= MAX_LEVEL ? 0 : (float) levelXP / XP_TABLE[level]);
             player.setLevel(level);
         }
     }
@@ -373,7 +374,7 @@ public class Stats {
     public void addXP(long amount) {
         totalXP += amount;
         levelXP += amount;
-        while (level < XP_TABLE.length && levelXP >= XP_TABLE[level]) {
+        while (level < MAX_LEVEL && levelXP >= XP_TABLE[level]) {
             levelXP -= XP_TABLE[level];
             ++level;
             freeSkill += 3;
