@@ -56,10 +56,11 @@ public class MyListener implements Listener {
                         stats.addXP(totalXP);
                         stats.setMaxHealth(100 + 10 * stats.getLevel());
                         stats.allocate(power, defense, speed, intelligence);
-                        System.out.println(stats.equip(RpgItem.fixItem(joined.getInventory().getHelmet()), "helmet"));
-                        System.out.println(stats.equip(RpgItem.fixItem(joined.getInventory().getChestplate()), "chestplate"));
-                        System.out.println(stats.equip(RpgItem.fixItem(joined.getInventory().getLeggings()), "leggings"));
-                        System.out.println(stats.equip(RpgItem.fixItem(joined.getInventory().getBoots()), "boots"));
+                        sendEquipErrorString(joined, stats.equip(RpgItem.fixItem(joined.getInventory().getHelmet()), "helmet"));
+                        sendEquipErrorString(joined, stats.equip(RpgItem.fixItem(joined.getInventory().getChestplate()), "chestplate"));
+                        sendEquipErrorString(joined, stats.equip(RpgItem.fixItem(joined.getInventory().getLeggings()), "leggings"));
+                        sendEquipErrorString(joined, stats.equip(RpgItem.fixItem(joined.getInventory().getBoots()), "boots"));
+                        sendEquipErrorString(joined, stats.equip(RpgItem.fixItem(joined.getInventory().getItemInMainHand()), "weapon"));
                         stats.heal(health);
                         stats.setHealthRegen(1.2);
                         ElementalDamageRange range = new ElementalDamageRange();
@@ -91,5 +92,12 @@ public class MyListener implements Listener {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void sendEquipErrorString(Player p, String s) {
+        if (s == null) {
+            return;
+        }
+        p.sendMessage("\u00a7c" + s);
     }
 }
