@@ -97,7 +97,7 @@ public class RpgItem {
         this.baseFireDefense = section.getInt("base.fireDefense");
         this.baseWindDefense = section.getInt("base.windDefense");
         this.baseWaterDefense = section.getInt("base.waterDefense");
-        this.baseDamage = ElementalDamageRange.fromConfig(section.getConfigurationSection("damage"));
+        this.baseDamage = ElementalDamageRange.fromConfig(section.getConfigurationSection("base.damage"));
 
         this.bonusMeleePercent = section.getInt("stats.meleePercent");
         this.bonusMeleeNeutral = section.getInt("stats.meleeNeutral");
@@ -188,6 +188,23 @@ public class RpgItem {
         }
         if (baseBonusIntelligence != 0) {
             lore.add(nToString(baseBonusIntelligence, true) + "\u00a77 Intelligence");
+        }
+        if (baseDamage != null) {
+            if (baseDamage.maxNeutral > 0) {
+                lore.add("\u00a76Neutral\u00a7r Damage: " + baseDamage.minNeutral + "-" + baseDamage.maxNeutral);
+            }
+            if (baseDamage.maxEarth > 0) {
+                lore.add("\u00a72Earth\u00a7r Damage: " + baseDamage.minEarth + "-" + baseDamage.maxEarth);
+            }
+            if (baseDamage.maxFire > 0) {
+                lore.add("\u00a74Fire\u00a7r Damage: " + baseDamage.minFire + "-" + baseDamage.maxFire);
+            }
+            if (baseDamage.maxWind > 0) {
+                lore.add("\u00a77Wind\u00a7r Damage: " + baseDamage.minWind + "-" + baseDamage.maxWind);
+            }
+            if (baseDamage.maxWater > 0) {
+                lore.add("\u00a7bWater\u00a7r Damage: " + baseDamage.minWater + "-" + baseDamage.maxWater);
+            }
         }
 
         if (reqLevel > 0) {
