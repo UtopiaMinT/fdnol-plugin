@@ -1,5 +1,6 @@
 package me.lkp111138.plugin.rpg.items;
 
+import me.lkp111138.plugin.rpg.Stats;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,6 +27,12 @@ public class RpgItemEventListener implements Listener {
             boolean quickBar = event.getSlotType() == InventoryType.SlotType.QUICKBAR;
             boolean container = event.getSlotType() == InventoryType.SlotType.CONTAINER;
             boolean armour = event.getSlotType() == InventoryType.SlotType.ARMOR;
+
+            System.out.println(event.getCurrentItem());
+            System.out.println(event.getCursor());
+            System.out.println(event.getSlotType());
+            System.out.println(event.getClick());
+            // TODO handle unequip
             if (isArmour(event.getCurrentItem())) {
                 if (shift) {
                     if (quickBar || container) {
@@ -71,7 +78,16 @@ public class RpgItemEventListener implements Listener {
     }
 
     private boolean onEquip(Player player, ItemStack item) {
-        return true;
+        Stats stats = Stats.extractFromEntity(player);
+        if (stats == null) {
+            return true;
+        }
+        String error = stats.equip(item);
+        if (error != null) {
+            player.sendMessage("\u00a7c" + error);
+            return true;
+        }
+        return false;
     }
 
     private boolean isArmour(ItemStack item) {

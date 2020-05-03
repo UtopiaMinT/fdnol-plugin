@@ -5,6 +5,8 @@ import me.lkp111138.plugin.Util;
 import me.lkp111138.plugin.rpg.damage.ElementalDamage;
 import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import me.lkp111138.plugin.rpg.defense.ElementalDefense;
+import me.lkp111138.plugin.rpg.items.Build;
+import me.lkp111138.plugin.rpg.items.RpgItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -13,6 +15,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.util.Vector;
 
@@ -22,6 +25,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 public class Stats {
+    // TODO apply items and apply bonuses
     private static final double K = 0.261648041296;
     private static final double A = 1.79654388542;
     private static final int[] XP_TABLE = {
@@ -78,6 +82,7 @@ public class Stats {
             90.31, 90.40, 90.48, 90.56, 90.64, 90.73, 90.81, 90.89, 90.97, 91.05
     };
 
+    // owner of the stats
     private final Entity entity;
     private double baseSpeed;
     private UUID uuid;
@@ -113,8 +118,11 @@ public class Stats {
     private boolean showBar;
     private ArmorStand barEntity;
 
+    private final Build build;
+
     public Stats(Entity entity) {
         this.entity = entity;
+        this.build = new Build();
         if (entity instanceof Player) {
             this.baseSpeed = ((Player) entity).getWalkSpeed();
             this.uuid = entity.getUniqueId();
@@ -125,7 +133,7 @@ public class Stats {
         long now = System.currentTimeMillis();
         if (lastDamage < now - 2000) {
             if (lastNaturalHeal < now - 1000) {
-                heal(healthRegen);
+                heal(getHealthRegen());
                 lastNaturalHeal = now;
             }
         }
@@ -171,11 +179,12 @@ public class Stats {
 
     public double damage(ElementalDamage elementalDamage) {
         // apply skills
+        ElementalDefense effectiveDefense = getEffectiveElementalDefense();
         elementalDamage.neutral = (int) Math.max(0, elementalDamage.neutral * (100 - SKILL_TABLE[defenseSkill]) / 100);
-        elementalDamage.wind = (int) Math.max(0, (elementalDamage.wind - elementalDefense.wind) * (100 - SKILL_TABLE[defenseSkill]) / 100);
-        elementalDamage.fire = (int) Math.max(0, (elementalDamage.fire - elementalDefense.fire) * (100 - SKILL_TABLE[defenseSkill]) / 100);
-        elementalDamage.earth = (int) Math.max(0, (elementalDamage.earth - elementalDefense.earth) * (100 - SKILL_TABLE[defenseSkill]) / 100);
-        elementalDamage.water = (int) Math.max(0, (elementalDamage.water - elementalDefense.water) * (100 - SKILL_TABLE[defenseSkill]) / 100);
+        elementalDamage.wind = (int) Math.max(0, (elementalDamage.wind - effectiveDefense.wind) * (100 - SKILL_TABLE[defenseSkill]) / 100);
+        elementalDamage.fire = (int) Math.max(0, (elementalDamage.fire - effectiveDefense.fire) * (100 - SKILL_TABLE[defenseSkill]) / 100);
+        elementalDamage.earth = (int) Math.max(0, (elementalDamage.earth - effectiveDefense.earth) * (100 - SKILL_TABLE[defenseSkill]) / 100);
+        elementalDamage.water = (int) Math.max(0, (elementalDamage.water - effectiveDefense.water) * (100 - SKILL_TABLE[defenseSkill]) / 100);
         double amount = elementalDamage.sum();
         if (health < amount && entity instanceof Player) {
             // players don't really die, they get a death stat and get tped to spawn instead
@@ -229,6 +238,57 @@ public class Stats {
         return amount / maxHealth * maxHearts * 2;
     }
 
+    private ElementalDefense getEffectiveElementalDefense() {
+        ElementalDefense effective = new ElementalDefense();
+        effective.fire = (elementalDefense.fire + build.getBaseFireDefense()) * (100 + build.getBonusFireDefense()) / 100.0;
+        effective.earth = (elementalDefense.earth + build.getBaseEarthDefense()) * (100 + build.getBonusEarthDefense()) / 100.0;
+        effective.water = (elementalDefense.water + build.getBaseWaterDefense()) * (100 + build.getBonusWaterDefense()) / 100.0;
+        effective.wind = (elementalDefense.wind + build.getBaseFireDefense()) * (100 + build.getBonusWindDefense()) / 100.0;
+        return effective;
+    }
+
+    public String equip(ItemStack item) {
+        // check if its a valid item
+        String itemId = RpgItem.getItemId(item);
+        RpgItem rpgItem = RpgItem.get(itemId);
+        if (itemId == null || rpgItem == null) {
+            return "Invalid Item!";
+        }
+        // check of stats fulfilled
+        if (getEffectivePowerSkill() < rpgItem.reqLevel) {
+            return String.format("%s requires your Level to be at least %s.", rpgItem.name, rpgItem.reqLevel);
+        }
+        if (getEffectivePowerSkill() < rpgItem.reqPower) {
+            return String.format("%s requires your Power Skill to be at least %s.", rpgItem.name, rpgItem.reqPower);
+        }
+        if (getEffectivePowerSkill() < rpgItem.reqIntelligence) {
+            return String.format("%s requires your Intelligence Skill to be at least %s.", rpgItem.name, rpgItem.reqIntelligence);
+        }
+        if (getEffectivePowerSkill() < rpgItem.reqSpeed) {
+            return String.format("%s requires your Speed Skill to be at least %s.", rpgItem.name, rpgItem.reqSpeed);
+        }
+        if (getEffectivePowerSkill() < rpgItem.reqDefense) {
+            return String.format("%s requires your Defense Skill to be at least %s.", rpgItem.name, rpgItem.reqDefense);
+        }
+        // ok real equip
+        switch (rpgItem.type) {
+            case "helmet":
+                build.setHelmet(item);
+                break;
+            case "chestplate":
+                build.setChestplate(item);
+                break;
+            case "leggings":
+                build.setLeggings(item);
+                break;
+            case "boots":
+                build.setBoots(item);
+                break;
+        }
+        setMaxHealth(maxHealth);
+        return null;
+    }
+
     public void addXP(long amount) {
         totalXP += amount;
         levelXP += amount;
@@ -272,17 +332,17 @@ public class Stats {
 
     public void damagePercent(double percent) {
         ElementalDamage elementalDamage = new ElementalDamage();
-        elementalDamage.neutral = (int) (percent / 100 * maxHealth);
+        elementalDamage.neutral = (int) (percent / 100 * getMaxHealth());
         damage(elementalDamage);
     }
 
     public void heal(double amount) {
         health += amount;
-        health = health > maxHealth ? maxHealth : health;
+        health = health > getMaxHealth() ? getMaxHealth() : health;
     }
 
     public void fullHeal() {
-        health = maxHealth;
+        health = getMaxHealth();
     }
 
     public int getMaxHearts() {
@@ -290,7 +350,7 @@ public class Stats {
     }
 
     public double getHealthHalfHearts() {
-        return health / maxHealth * maxHearts * 2;
+        return health / getMaxHealth() * maxHearts * 2;
     }
 
     public double getHealth() {
@@ -298,20 +358,20 @@ public class Stats {
     }
 
     public double getMaxHealth() {
-        return maxHealth;
+        return maxHealth + build.getBaseHealth() + build.getBonusHealth();
     }
 
     public double getHealthRegen() {
-        return healthRegen;
+        return (healthRegen + build.getBonusHealthRegen());
     }
 
-    public ElementalDamage getDamage() {
+    public ElementalDamage getMeleeDamage() {
         ElementalDamage damage = this.damage.getDamage();
-        damage.earth *= (100 + SKILL_TABLE[powerSkill] + SKILL_TABLE[powerSkill]) / 100;
-        damage.water *= (100 + SKILL_TABLE[powerSkill] + SKILL_TABLE[intelligenceSkill]) / 100;
-        damage.wind *= (100 + SKILL_TABLE[powerSkill] + SKILL_TABLE[speedSkill]) / 100;
-        damage.fire *= (100 + SKILL_TABLE[powerSkill] + SKILL_TABLE[defenseSkill]) / 100;
-        damage.neutral *= (100 + SKILL_TABLE[powerSkill]) / 100;
+        damage.earth *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectivePowerSkill()] + build.getBonusMeleePercent() + build.getBonusEarthDamage()) / 100;
+        damage.water *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveIntelligenceSkill()] + build.getBonusMeleePercent() + build.getBonusWaterDamage()) / 100;
+        damage.wind *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveSpeedSkill()] + build.getBonusMeleePercent() + build.getBonusWindDamage()) / 100;
+        damage.fire *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveDefenseSkill()] + build.getBonusMeleePercent() + build.getBonusFireDamage()) / 100;
+        damage.neutral *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + build.getBonusMeleePercent()) / 100;
         return damage;
     }
 
@@ -335,6 +395,22 @@ public class Stats {
         return intelligenceSkill;
     }
 
+    public int getEffectivePowerSkill() {
+        return powerSkill + build.getBaseBonusPower();
+    }
+
+    public int getEffectiveDefenseSkill() {
+        return defenseSkill + build.getBaseBonusDefense();
+    }
+
+    public int getEffectiveSpeedSkill() {
+        return speedSkill + build.getBaseBonusSpeed();
+    }
+
+    public int getEffectiveIntelligenceSkill() {
+        return intelligenceSkill + build.getBaseBonusIntelligence();
+    }
+
     public int getFreeSkill() {
         return freeSkill;
     }
@@ -349,7 +425,7 @@ public class Stats {
 
     public void setMaxHealth(double maxHealth) {
         this.maxHealth = maxHealth;
-        this.maxHearts = (int) (A * Math.pow(maxHealth, K));
+        this.maxHearts = (int) (A * Math.pow(getMaxHealth(), K));
     }
 
     public void setDamage(ElementalDamageRange damage) {

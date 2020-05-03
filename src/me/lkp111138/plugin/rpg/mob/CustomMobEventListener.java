@@ -50,7 +50,7 @@ public class CustomMobEventListener implements Listener {
             return;
         }
         if (damagee instanceof LivingEntity) {
-            double damageInHalfHearts = damageeStat.damage(damagerStat.getDamage());
+            double damageInHalfHearts = damageeStat.damage(damagerStat.getMeleeDamage());
             if (!(damagee instanceof Player)) {
                 if (damageeStat.getHealth() > 0) {
                     ((LivingEntity) damagee).damage(0.0001);

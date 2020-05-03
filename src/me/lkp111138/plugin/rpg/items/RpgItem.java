@@ -129,6 +129,7 @@ public class RpgItem {
                 line.append(word);
             }
         }
+        this.lore.add(line.toString()); // last line
         registry.put(id, this);
     }
 
@@ -136,20 +137,27 @@ public class RpgItem {
         return registry.get(id);
     }
 
-    public static ItemStack fixItem(ItemStack itemStack) {
+    public static String getItemId(ItemStack itemStack) {
         net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         NBTTagCompound compound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
         NBTTagCompound rpg = compound.getCompound("RPG");
         if (rpg != null) {
-            String itemId = rpg.getString("ITEM_ID");
+            return rpg.getString("ITEM_ID");
+        }
+        return null;
+    }
+
+    public static ItemStack fixItem(ItemStack itemStack) {
+        String itemId = getItemId(itemStack);
+        if (itemId != null) {
             if (registry.containsKey(itemId)) {
-                return registry.get(itemId).fixItemInternal(itemStack);
+                return registry.get(itemId).fixStack(itemStack);
             }
         }
         return null;
     }
 
-    private ItemStack fixItemInternal(ItemStack itemStack) {
+    public ItemStack fixStack(ItemStack itemStack) {
         // stage 2: show stats on item
         List<String> lore = new ArrayList<>();
         // base stats
@@ -197,31 +205,31 @@ public class RpgItem {
         net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         NBTTagCompound compound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
         NBTTagCompound rpg = new NBTTagCompound();
-        rpg.set("meleePercent", new NBTTagInt(getRollFor(bonusMeleePercent)));
-        rpg.set("meleeNeutral", new NBTTagInt(getRollFor(bonusMeleeNeutral)));
-        rpg.set("earthDefense", new NBTTagInt(getRollFor(bonusEarthDefense)));
-        rpg.set("fireDefense", new NBTTagInt(getRollFor(bonusFireDefense)));
-        rpg.set("windDefense", new NBTTagInt(getRollFor(bonusWindDefense)));
-        rpg.set("waterDefense", new NBTTagInt(getRollFor(bonusWaterDefense)));
-        rpg.set("earthDamage", new NBTTagInt(getRollFor(bonusEarthDamage)));
-        rpg.set("fireDamage", new NBTTagInt(getRollFor(bonusFireDamage)));
-        rpg.set("windDamage", new NBTTagInt(getRollFor(bonusWindDamage)));
-        rpg.set("waterDamage", new NBTTagInt(getRollFor(bonusWaterDamage)));
-        rpg.set("healthRegen", new NBTTagInt(getRollFor(bonusHealthRegen)));
-        rpg.set("health", new NBTTagInt(getRollFor(bonusHealth)));
-        rpg.set("walkSpeed", new NBTTagInt(getRollFor(bonusWalkSpeed)));
+        rpg.set("MeleePercent", new NBTTagInt(getRollFor(bonusMeleePercent)));
+        rpg.set("MeleeNeutral", new NBTTagInt(getRollFor(bonusMeleeNeutral)));
+        rpg.set("EarthDefense", new NBTTagInt(getRollFor(bonusEarthDefense)));
+        rpg.set("FireDefense", new NBTTagInt(getRollFor(bonusFireDefense)));
+        rpg.set("WindDefense", new NBTTagInt(getRollFor(bonusWindDefense)));
+        rpg.set("WaterDefense", new NBTTagInt(getRollFor(bonusWaterDefense)));
+        rpg.set("EarthDamage", new NBTTagInt(getRollFor(bonusEarthDamage)));
+        rpg.set("FireDamage", new NBTTagInt(getRollFor(bonusFireDamage)));
+        rpg.set("WindDamage", new NBTTagInt(getRollFor(bonusWindDamage)));
+        rpg.set("WaterDamage", new NBTTagInt(getRollFor(bonusWaterDamage)));
+        rpg.set("HealthRegen", new NBTTagInt(getRollFor(bonusHealthRegen)));
+        rpg.set("Health", new NBTTagInt(getRollFor(bonusHealth)));
+        rpg.set("WalkSpeed", new NBTTagInt(getRollFor(bonusWalkSpeed)));
         rpg.set("ITEM_ID", new NBTTagString(id));
         compound.set("RPG", rpg);
         compound.set("HideFlags", new NBTTagInt(63));
         nmsStack.setTag(compound);
         itemStack = CraftItemStack.asBukkitCopy(nmsStack);
 
-        return fixItemInternal(itemStack);
+        return fixStack(itemStack);
     }
 
     private int getRollFor(int value) {
         if (value > 0) {
-            return(int) (positiveMin + (positiveMax - positiveMin + 1) * Math.random());
+            return (int) (positiveMin + (positiveMax - positiveMin + 1) * Math.random());
         } else {
             return (int) (negativeMin + (negativeMax - negativeMin + 1) * Math.random());
         }
