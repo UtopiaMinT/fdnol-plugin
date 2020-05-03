@@ -1,6 +1,7 @@
 package me.lkp111138.plugin.rpg.items;
 
 import me.lkp111138.plugin.Util;
+import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NBTTagInt;
 import net.minecraft.server.v1_12_R1.NBTTagString;
@@ -42,6 +43,7 @@ public class RpgItem {
     public final int baseFireDefense;
     public final int baseWindDefense;
     public final int baseWaterDefense;
+    public final ElementalDamageRange baseDamage;
 
     // bonuses
     public final int bonusMeleePercent;
@@ -95,6 +97,7 @@ public class RpgItem {
         this.baseFireDefense = section.getInt("base.fireDefense");
         this.baseWindDefense = section.getInt("base.windDefense");
         this.baseWaterDefense = section.getInt("base.waterDefense");
+        this.baseDamage = ElementalDamageRange.fromConfig(section.getConfigurationSection("damage"));
 
         this.bonusMeleePercent = section.getInt("stats.meleePercent");
         this.bonusMeleeNeutral = section.getInt("stats.meleeNeutral");

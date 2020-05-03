@@ -18,6 +18,9 @@ public class ElementalDamageRange {
 
     public static ElementalDamageRange fromConfig(ConfigurationSection section) {
         ElementalDamageRange range = new ElementalDamageRange();
+        if (section == null) {
+            return range;
+        }
         List<Double> neutral = section.getDoubleList("neutral");
         range.minNeutral = neutral.get(0);
         range.maxNeutral = neutral.get(1);
