@@ -319,6 +319,9 @@ public class Stats {
             System.out.println(0.15f);
             System.out.println(0.15f * (100 + build.getBonusWalkSpeed()) / 100f);
             ((Player) entity).setWalkSpeed(Math.max(0, Math.min(1, 0.15f * (100 + build.getBonusWalkSpeed()) / 100f)));
+            if (!slot.equals("weapon")) {
+                equip(((Player) entity).getInventory().getItemInMainHand(), "weapon");
+            }
         }
         return null;
     }
