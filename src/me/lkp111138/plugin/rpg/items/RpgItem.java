@@ -268,7 +268,12 @@ public class RpgItem {
     }
 
     private ItemStack getItem() {
-        String itemType = (texture + "_" + type).toUpperCase();
+        String itemType;
+        if (type.equals("weapon")) {
+            itemType = texture.toUpperCase();
+        } else {
+            itemType = (texture + "_" + type).toUpperCase();
+        }
         ItemStack itemStack = new ItemStack(Material.valueOf(itemType));
         ItemMeta meta = itemStack.getItemMeta();
         if (texture.equals("leather")) {

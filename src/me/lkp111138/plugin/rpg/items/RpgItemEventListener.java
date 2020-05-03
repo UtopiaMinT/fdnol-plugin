@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class RpgItemEventListener implements Listener {
@@ -89,6 +90,11 @@ public class RpgItemEventListener implements Listener {
         if (isArmour(event.getItem()) && ((event.getAction() == Action.RIGHT_CLICK_AIR) || (event.getAction() == Action.RIGHT_CLICK_BLOCK))) {
             event.setCancelled(onEquip(event.getPlayer(), event.getItem(), armourType(event.getItem())));
         }
+    }
+
+    @EventHandler
+    public void onHotbarSwitch(PlayerItemHeldEvent event) {
+        onEquip(event.getPlayer(), event.getPlayer().getInventory().getItem(event.getNewSlot()), "weapon");
     }
 
     private boolean onEquip(Player player, ItemStack item, String slot) {

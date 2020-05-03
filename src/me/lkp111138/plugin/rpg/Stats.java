@@ -98,7 +98,7 @@ public class Stats {
 
     // owner of the stats
     private final Entity entity;
-    private double baseSpeed;
+    private float baseSpeed;
     private UUID uuid;
 
     // base defenses
@@ -141,6 +141,8 @@ public class Stats {
             this.baseSpeed = ((Player) entity).getWalkSpeed();
             this.uuid = entity.getUniqueId();
         }
+        this.elementalDefense = new ElementalDefense();
+        this.damage = new ElementalDamageRange();
     }
 
     public void tick(Location entityLoc) {
@@ -257,7 +259,7 @@ public class Stats {
         effective.fire = (elementalDefense.fire + build.getBaseFireDefense()) * (100 + build.getBonusFireDefense()) / 100.0;
         effective.earth = (elementalDefense.earth + build.getBaseEarthDefense()) * (100 + build.getBonusEarthDefense()) / 100.0;
         effective.water = (elementalDefense.water + build.getBaseWaterDefense()) * (100 + build.getBonusWaterDefense()) / 100.0;
-        effective.wind = (elementalDefense.wind + build.getBaseFireDefense()) * (100 + build.getBonusWindDefense()) / 100.0;
+        effective.wind = (elementalDefense.wind + build.getBaseWindDefense()) * (100 + build.getBonusWindDefense()) / 100.0;
         return effective;
     }
 
@@ -301,10 +303,16 @@ public class Stats {
             case "boots":
                 build.setBoots(item);
                 break;
+            case "weapon":
+                build.setWeapon(item);
+                break;
         }
         setMaxHealth(maxHealth);
         if (entity instanceof Player) {
-            ((Player) entity).getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-20);
+            ((Player) entity).getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
+            System.out.println(0.15f);
+            System.out.println(0.15f * (100 + build.getBonusWalkSpeed()) / 100f);
+            ((Player) entity).setWalkSpeed(Math.max(0, Math.min(1, 0.15f * (100 + build.getBonusWalkSpeed()) / 100f)));
         }
         return null;
     }
@@ -323,6 +331,7 @@ public class Stats {
         build.setChestplate(null);
         build.setLeggings(null);
         build.setBoots(null);
+        build.setWeapon(null);
         while (true) {
             int count = 0;
             for (Iterator<String> iterator = buildItems.keySet().iterator(); iterator.hasNext(); ) {
@@ -350,6 +359,10 @@ public class Stats {
         }
         setMaxHealth(maxHealth);
         heal(0);
+        if (entity instanceof Player) {
+            ((Player) entity).getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
+            ((Player) entity).setWalkSpeed(baseSpeed * (100 + build.getBonusWalkSpeed()) / 100f);
+        }
     }
 
     public void addXP(long amount) {
@@ -377,7 +390,7 @@ public class Stats {
             this.freeSkill -= total;
             double speedAttribute = baseSpeed * (100 + SKILL_TABLE[this.speedSkill]) / 100;
             if (entity instanceof Player) {
-                ((Player) entity).setWalkSpeed((float) speedAttribute);
+//                ((Player) entity).setWalkSpeed((float) speedAttribute);
             }
         }
     }
@@ -434,7 +447,7 @@ public class Stats {
         damage.water *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveIntelligenceSkill()] + build.getBonusMeleePercent() + build.getBonusWaterDamage()) / 100;
         damage.wind *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveSpeedSkill()] + build.getBonusMeleePercent() + build.getBonusWindDamage()) / 100;
         damage.fire *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveDefenseSkill()] + build.getBonusMeleePercent() + build.getBonusFireDamage()) / 100;
-        damage.neutral *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + build.getBonusMeleePercent()) / 100;
+        damage.neutral *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + build.getBonusMeleePercent()) / 100 + build.getBonusMeleeNeutral();
         return damage;
     }
 
