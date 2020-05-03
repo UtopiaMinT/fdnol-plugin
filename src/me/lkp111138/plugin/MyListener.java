@@ -37,11 +37,10 @@ public class MyListener implements Listener {
                     // new player
                     Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {
                         stats.setMaxHealth(100);
-                        stats.fullHeal();
-                        stats.setHealthRegen(1.2);
+                        stats.setHealthRegen(0);
                         ElementalDamageRange range = new ElementalDamageRange();
-                        range.minNeutral = 20;
-                        range.maxNeutral = 40;
+                        range.minNeutral = 1;
+                        range.maxNeutral = 1;
                         stats.setDamage(range);
                         stats.setElementalDefense(new ElementalDefense());
                     }, 0);
