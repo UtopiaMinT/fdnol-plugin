@@ -33,7 +33,7 @@ public class HealthBarTask implements Runnable {
                 if (stats != null) {
                     if (entity instanceof Player) {
                         ((CraftPlayer) entity).setMaxHealth(stats.getMaxHearts() * 2);
-                        entity.setHealth(stats.getHealthHalfHearts());
+                        entity.setHealth(Math.min(stats.getHealthHalfHearts(), stats.getMaxHearts() * 2));
                         Player player = (Player) entity;
                         player.setFoodLevel(20);
                         Util.sendActionBar(player, String.format("\u00a74❤ %.0f / %.0f", stats.getHealth(), stats.getMaxHealth()));
