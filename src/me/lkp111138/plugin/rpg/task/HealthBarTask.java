@@ -31,6 +31,7 @@ public class HealthBarTask implements Runnable {
                 LivingEntity entity = (LivingEntity) _entity;
                 Stats stats = Stats.extractFromEntity(entity);
                 if (stats != null) {
+                    stats.tick(entity.getLocation());
                     if (entity instanceof Player) {
                         ((CraftPlayer) entity).setMaxHealth(stats.getMaxHearts() * 2);
                         entity.setHealth(Math.min(stats.getHealthHalfHearts(), stats.getMaxHearts() * 2));
@@ -38,7 +39,6 @@ public class HealthBarTask implements Runnable {
                         player.setFoodLevel(20);
                         Util.sendActionBar(player, String.format("\u00a74❤ %.0f / %.0f", stats.getHealth(), stats.getMaxHealth()));
                     }
-                    stats.tick(entity.getLocation());
                     if (save) {
                         try {
                             stats.save();
