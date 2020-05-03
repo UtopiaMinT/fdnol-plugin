@@ -447,7 +447,7 @@ public class Stats {
     }
 
     public ElementalDamage getMeleeDamage() {
-        ElementalDamage damage = this.damage.getDamage();
+        ElementalDamage damage = this.build.getBaseDamage().getDamage();
         damage.earth *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectivePowerSkill()] + build.getBonusMeleePercent() + build.getBonusEarthDamage()) / 100;
         damage.water *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveIntelligenceSkill()] + build.getBonusMeleePercent() + build.getBonusWaterDamage()) / 100;
         damage.wind *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveSpeedSkill()] + build.getBonusMeleePercent() + build.getBonusWindDamage()) / 100;

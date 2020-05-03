@@ -1,5 +1,6 @@
 package me.lkp111138.plugin.rpg.items;
 
+import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -21,6 +22,7 @@ public class Build {
     private int baseFireDefense;
     private int baseWindDefense;
     private int baseWaterDefense;
+    private ElementalDamageRange baseDamage = new ElementalDamageRange();
 
     // bonuses
     private int bonusMeleePercent;
@@ -139,6 +141,7 @@ public class Build {
         baseFireDefense += multiplier * rpgItem.baseFireDefense;
         baseWindDefense += multiplier * rpgItem.baseWindDefense;
         baseWaterDefense += multiplier * rpgItem.baseWaterDefense;
+        baseDamage = baseDamage.add(rpgItem.baseDamage, multiplier);
         // bonus
         bonusMeleePercent += multiplier * (int) (rpgItem.bonusMeleePercent * rpg.getInt("MeleePercent") / 100.0);
         bonusMeleeNeutral += multiplier * (int) (rpgItem.bonusMeleeNeutral * rpg.getInt("MeleeNeutral") / 100.0);
@@ -189,6 +192,10 @@ public class Build {
 
     public int getBaseWaterDefense() {
         return baseWaterDefense;
+    }
+
+    public ElementalDamageRange getBaseDamage() {
+        return baseDamage;
     }
 
     public int getBonusMeleePercent() {
