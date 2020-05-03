@@ -160,11 +160,31 @@ public class RpgItem {
         return null;
     }
 
-    public ItemStack fixStack(ItemStack itemStack) {
+    private ItemStack fixStack(ItemStack itemStack) {
         // stage 2: show stats on item
         List<String> lore = new ArrayList<>();
+        int lines = 0;
         // base stats
-        lore.add("\u00a7r\u00a74HP " + nToString(baseHealth));
+        if (baseDamage != null) {
+            if (baseDamage.maxNeutral > 0) {
+                lore.add(String.format("§6Neutral§7 Damage: %.0f-%.0f", baseDamage.minNeutral, baseDamage.maxNeutral));
+            }
+            if (baseDamage.maxEarth > 0) {
+                lore.add(String.format("§2Earth§7 Damage: %.0f-%.0f", baseDamage.minEarth, baseDamage.maxEarth));
+            }
+            if (baseDamage.maxFire > 0) {
+                lore.add(String.format("§4Fire§7 Damage: %.0f-%.0f", baseDamage.minFire, baseDamage.maxFire));
+            }
+            if (baseDamage.maxWind > 0) {
+                lore.add(String.format("§7Wind§7 Damage: %.0f-%.0f", baseDamage.minWind, baseDamage.maxWind));
+            }
+            if (baseDamage.maxWater > 0) {
+                lore.add(String.format("§bWater§7 Damage: %.0f-%.0f", baseDamage.minWater, baseDamage.maxWater));
+            }
+        }
+        if (baseHealth != 0) {
+            lore.add("\u00a7r\u00a74HP " + nToString(baseHealth));
+        }
         if (baseEarthDefense != 0) {
             lore.add("§r§2Earth defense §7" + nToString(baseEarthDefense));
         }
@@ -189,23 +209,10 @@ public class RpgItem {
         if (baseBonusIntelligence != 0) {
             lore.add(nToString(baseBonusIntelligence, true) + "\u00a77 Intelligence");
         }
-        if (baseDamage != null) {
-            if (baseDamage.maxNeutral > 0) {
-                lore.add("\u00a76Neutral\u00a7r Damage: " + baseDamage.minNeutral + "-" + baseDamage.maxNeutral);
-            }
-            if (baseDamage.maxEarth > 0) {
-                lore.add("\u00a72Earth\u00a7r Damage: " + baseDamage.minEarth + "-" + baseDamage.maxEarth);
-            }
-            if (baseDamage.maxFire > 0) {
-                lore.add("\u00a74Fire\u00a7r Damage: " + baseDamage.minFire + "-" + baseDamage.maxFire);
-            }
-            if (baseDamage.maxWind > 0) {
-                lore.add("\u00a77Wind\u00a7r Damage: " + baseDamage.minWind + "-" + baseDamage.maxWind);
-            }
-            if (baseDamage.maxWater > 0) {
-                lore.add("\u00a7bWater\u00a7r Damage: " + baseDamage.minWater + "-" + baseDamage.maxWater);
-            }
+        if (lore.size() > lines) {
+            lore.add("");
         }
+        lines = lore.size();
 
         if (reqLevel > 0) {
             lore.add("\u00a77Min Level: " + reqLevel);
@@ -222,6 +229,10 @@ public class RpgItem {
         if (reqIntelligence > 0) {
             lore.add("\u00a77Min Intelligence: " + reqIntelligence);
         }
+        if (lore.size() > lines) {
+            lore.add("");
+        }
+        lines = lore.size();
 
         net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         NBTTagCompound compound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
@@ -265,9 +276,13 @@ public class RpgItem {
         if (bonusWalkSpeed > 0) {
             lore.add(nToString((int) (bonusWalkSpeed * rpg.getInt("WalkSpeed") / 100.0), true) + "% \u00a77Walk Speed");
         }
-        lore.add("");
-        lore.addAll(this.lore);
+
+        if (lore.size() > lines) {
+            lore.add("");
+        }
+        lines = lore.size();
         lore.add(tierPrefix.get(tier) + Util.capitalize(tier) + " Item");
+        lore.addAll(this.lore);
         ItemMeta meta = itemStack.getItemMeta();
         meta.setLore(lore);
         meta.setUnbreakable(true);
