@@ -44,8 +44,12 @@ public class Build {
         if (this.helmet != null) {
             adjustStats(this.helmet, -1);
         }
-        adjustStats(helmet, 1);
-        this.helmet = helmet;
+        if (helmet != null) {
+            adjustStats(helmet, 1);
+            this.helmet = helmet.clone();
+        } else {
+            this.helmet = null;
+        }
     }
 
     public ItemStack getChestplate() {
@@ -56,8 +60,12 @@ public class Build {
         if (this.chestplate != null) {
             adjustStats(this.chestplate, -1);
         }
-        adjustStats(chestplate, 1);
-        this.chestplate = chestplate;
+        if (chestplate != null) {
+            adjustStats(chestplate, 1);
+            this.chestplate = chestplate.clone();
+        } else {
+            this.chestplate = null;
+        }
     }
 
     public ItemStack getLeggings() {
@@ -68,8 +76,12 @@ public class Build {
         if (this.leggings != null) {
             adjustStats(this.leggings, -1);
         }
-        adjustStats(leggings, 1);
-        this.leggings = leggings;
+        if (leggings != null) {
+            adjustStats(leggings, 1);
+            this.leggings = leggings.clone();
+        } else {
+            this.leggings = null;
+        }
     }
 
     public ItemStack getBoots() {
@@ -80,8 +92,12 @@ public class Build {
         if (this.boots != null) {
             adjustStats(this.boots, -1);
         }
-        adjustStats(boots, 1);
-        this.boots = boots;
+        if (boots != null) {
+            adjustStats(boots, 1);
+            this.boots = boots.clone();
+        } else {
+            this.boots = null;
+        }
     }
 
     private void adjustStats(ItemStack item, int multiplier) {
