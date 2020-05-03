@@ -37,7 +37,7 @@ public class CommandSkills implements CommandExecutor {
             reset(gui, stats, player);
             gui.rename(player, "Skills - " + stats.getFreeSkill() + " Points remaining");
         }));
-        int strengthSkill = stats.getPowerSkill();
+        int strengthSkill = stats.getRawPowerSkill();
         ItemStack strengthBook = strengthBook(strengthSkill);
         gui.set(0, new ChestGui.Slot(strengthBook, event -> {
             int p = 1;
@@ -48,7 +48,7 @@ public class CommandSkills implements CommandExecutor {
             reset(gui, stats, player);
             gui.rename(player, "Skills - " + stats.getFreeSkill() + " Points remaining");
         }));
-        int defenseSkill = stats.getDefenseSkill();
+        int defenseSkill = stats.getRawDefenseSkill();
         ItemStack defenseBook = defenseBook(defenseSkill);
         gui.set(1, new ChestGui.Slot(defenseBook, event -> {
             int p = 1;
@@ -59,7 +59,7 @@ public class CommandSkills implements CommandExecutor {
             reset(gui, stats, player);
             gui.rename(player, "Skills - " + stats.getFreeSkill() + " Points remaining");
         }));
-        int speedSkill = stats.getSpeedSkill();
+        int speedSkill = stats.getRawSpeedSkill();
         ItemStack speedBook = speedBook(speedSkill);
         gui.set(2, new ChestGui.Slot(speedBook, event -> {
             int p = 1;
@@ -70,7 +70,7 @@ public class CommandSkills implements CommandExecutor {
             reset(gui, stats, player);
             gui.rename(player, "Skills - " + stats.getFreeSkill() + " Points remaining");
         }));
-        int intelligenceSkill = stats.getIntelligenceSkill();
+        int intelligenceSkill = stats.getRawIntelligenceSkill();
         ItemStack intelligenceBook = intelligenceBook(intelligenceSkill);
         gui.set(3, new ChestGui.Slot(intelligenceBook, event -> {
             int p = 1;

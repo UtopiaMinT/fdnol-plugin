@@ -319,19 +319,19 @@ public class Stats {
         return totalXP;
     }
 
-    public int getPowerSkill() {
+    public int getRawPowerSkill() {
         return powerSkill;
     }
 
-    public int getDefenseSkill() {
+    public int getRawDefenseSkill() {
         return defenseSkill;
     }
 
-    public int getSpeedSkill() {
+    public int getRawSpeedSkill() {
         return speedSkill;
     }
 
-    public int getIntelligenceSkill() {
+    public int getRawIntelligenceSkill() {
         return intelligenceSkill;
     }
 
