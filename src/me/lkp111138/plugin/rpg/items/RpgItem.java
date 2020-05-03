@@ -26,45 +26,45 @@ public class RpgItem {
     private static Map<String, RpgItem> registry = new HashMap<>();
 
     // requirements
-    private final int reqPower;
-    private final int reqDefense;
-    private final int reqSpeed;
-    private final int reqIntelligence;
-    private final int reqLevel;
+    public final int reqPower;
+    public final int reqDefense;
+    public final int reqSpeed;
+    public final int reqIntelligence;
+    public final int reqLevel;
 
     // base
-    private final int baseBonusPower;
-    private final int baseBonusDefense;
-    private final int baseBonusSpeed;
-    private final int baseBonusIntelligence;
-    private final int baseHealth;
-    private final int baseEarthDefense;
-    private final int baseFireDefense;
-    private final int baseWindDefense;
-    private final int baseWaterDefense;
+    public final int baseBonusPower;
+    public final int baseBonusDefense;
+    public final int baseBonusSpeed;
+    public final int baseBonusIntelligence;
+    public final int baseHealth;
+    public final int baseEarthDefense;
+    public final int baseFireDefense;
+    public final int baseWindDefense;
+    public final int baseWaterDefense;
 
     // bonuses
-    private final int bonusMeleePercent;
-    private final int bonusMeleeNeutral;
-    private final int bonusEarthDefense;
-    private final int bonusFireDefense;
-    private final int bonusWindDefense;
-    private final int bonusWaterDefense;
-    private final int bonusEarthDamage;
-    private final int bonusFireDamage;
-    private final int bonusWindDamage;
-    private final int bonusWaterDamage;
-    private final int bonusHealthRegen;
-    private final int bonusHealth;
-    private final int bonusWalkSpeed;
+    public final int bonusMeleePercent;
+    public final int bonusMeleeNeutral;
+    public final int bonusEarthDefense;
+    public final int bonusFireDefense;
+    public final int bonusWindDefense;
+    public final int bonusWaterDefense;
+    public final int bonusEarthDamage;
+    public final int bonusFireDamage;
+    public final int bonusWindDamage;
+    public final int bonusWaterDamage;
+    public final int bonusHealthRegen;
+    public final int bonusHealth;
+    public final int bonusWalkSpeed;
 
-    private final String id;
-    private final String name;
-    private final String type;
-    private final String texture;
-    private final String color;
-    private final String tier;
-    private final List<String> lore;
+    public final String id;
+    public final String name;
+    public final String type;
+    public final String texture;
+    public final String color;
+    public final String tier;
+    public final List<String> lore;
 
     public static void init(ConfigurationSection section) {
         List<Integer> positiveRange = section.getIntegerList("positive_range");
