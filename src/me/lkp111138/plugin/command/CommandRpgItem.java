@@ -29,8 +29,9 @@ public class CommandRpgItem implements CommandExecutor {
                     }
                     break;
                 case "fix":
-                    ItemStack itemStack = RpgItem.fixItem(player.getInventory().getItemInMainHand());
-                    if (itemStack != null) {
+                    ItemStack item = player.getInventory().getItemInMainHand();
+                    ItemStack itemStack = RpgItem.fixItem(item);
+                    if (itemStack != item) {
                         player.getInventory().setItemInMainHand(itemStack);
                     } else {
                         sender.sendMessage("\u00a7cThis is not a rpgItem");

@@ -3,6 +3,7 @@ package me.lkp111138.plugin;
 import me.lkp111138.plugin.rpg.Stats;
 import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import me.lkp111138.plugin.rpg.defense.ElementalDefense;
+import me.lkp111138.plugin.rpg.items.RpgItem;
 import me.lkp111138.plugin.rpg.mob.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,6 +16,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -24,6 +27,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class MyListener implements Listener {
@@ -41,6 +45,8 @@ public class MyListener implements Listener {
                 stmt.setBytes(1, Util.getBytesFromUUID(joined.getUniqueId()));
                 ResultSet rs = stmt.executeQuery();
                 Stats stats = new Stats(joined);
+                PlayerInventory inventory = joined.getInventory();
+                inventory.setContents(Arrays.stream(inventory.getContents()).map(RpgItem::fixItem).toArray(ItemStack[]::new));
                 if (!rs.next()) {
                     // new player
                     Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), () -> {

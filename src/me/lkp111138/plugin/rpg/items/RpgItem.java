@@ -157,7 +157,7 @@ public class RpgItem {
                 return registry.get(itemId).fixStack(itemStack);
             }
         }
-        return null;
+        return itemStack;
     }
 
     private ItemStack fixStack(ItemStack itemStack) {
