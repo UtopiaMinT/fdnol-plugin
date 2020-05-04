@@ -17,9 +17,6 @@ import org.bukkit.util.Vector;
 public class CustomMobEventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(EntityDamageEvent event) {
-        if (event.getCause() != EntityDamageEvent.DamageCause.CUSTOM) {
-            System.out.println("high");
-        }
         Entity entity = event.getEntity();
         if (Stats.extractFromEntity(entity) != null) {
             switch (event.getCause()) {
@@ -53,7 +50,10 @@ public class CustomMobEventListener implements Listener {
         Entity damagee = event.getEntity();
         Stats damagerStat = Stats.extractFromEntity(damager);
         Stats damageeStat = Stats.extractFromEntity(damagee);
-        if (damagerStat == null || damageeStat == null || event.getCause() != EntityDamageEvent.DamageCause.CUSTOM) {
+        if (damagerStat == null || damageeStat == null) {
+            return;
+        }
+        if (event.getCause() != EntityDamageEvent.DamageCause.CUSTOM && damager instanceof Player) {
             return;
         }
         if (damagee instanceof LivingEntity) {
