@@ -14,6 +14,7 @@ import static org.bukkit.Bukkit.getServer;
 
 public class HealthBarTask implements Runnable {
     private final boolean save;
+    private int runCount;
 
     public HealthBarTask(boolean save) {
         this.save = save;
@@ -25,6 +26,7 @@ public class HealthBarTask implements Runnable {
 
     @Override
     public void run() {
+        ++runCount;
         List<Entity> entities = getServer().getWorld("world").getEntities();
         entities.forEach(_entity -> {
             if (_entity instanceof LivingEntity) {
@@ -37,6 +39,7 @@ public class HealthBarTask implements Runnable {
                         entity.setHealth(Math.min(stats.getHealthHalfHearts(), stats.getMaxHearts() * 2));
                         Player player = (Player) entity;
                         player.setFoodLevel(20);
+                        stats.resetBuild(runCount % 20 == 2);
                         Util.sendActionBar(player, String.format("\u00a74❤ %.0f / %.0f", stats.getHealth(), stats.getMaxHealth()));
                     }
                     if (save) {

@@ -24,7 +24,9 @@ import org.bukkit.util.Vector;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class Stats {
     // TODO apply items and apply bonuses
@@ -99,7 +101,11 @@ public class Stats {
 
     // owner of the stats
     private final Entity entity;
+    private final Player player;
     private UUID uuid;
+    private final Build build;
+    private int buildHash;
+    private boolean xpAwarded;
 
     // base defenses
     private double health;
@@ -132,14 +138,15 @@ public class Stats {
     private boolean showBar;
     private ArmorStand barEntity;
 
-    private final Build build;
 
     public Stats(Entity entity) {
         this.entity = entity;
         this.build = new Build();
         if (entity instanceof Player) {
-            this.baseSpeed = ((Player) entity).getWalkSpeed();
             this.uuid = entity.getUniqueId();
+            this.player = (Player) entity;
+        } else {
+            this.player = null;
         }
         this.elementalDefense = new ElementalDefense();
         this.damage = new ElementalDamageRange();
@@ -186,8 +193,7 @@ public class Stats {
                 barEntity = null;
             }
         }
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (player != null) {
             player.setExp(level >= MAX_LEVEL ? 0 : (float) levelXP / XP_TABLE[level]);
             player.setLevel(level);
         }
@@ -202,19 +208,20 @@ public class Stats {
         elementalDamage.earth = (int) Math.max(0, (elementalDamage.earth - effectiveDefense.earth) * (100 - SKILL_TABLE[defenseSkill]) / 100);
         elementalDamage.water = (int) Math.max(0, (elementalDamage.water - effectiveDefense.water) * (100 - SKILL_TABLE[defenseSkill]) / 100);
         double amount = elementalDamage.sum();
-        if (health < amount && entity instanceof Player) {
+        if (health < amount && player != null) {
             // players don't really die, they get a death stat and get tped to spawn instead
             double damage = getHealthHalfHearts() - 0.0001;
             fullHeal();
             ++deaths;
-            entity.teleport(new Location(entity.getWorld(), -111.5, 104, 272.5));
-            ((Player) entity).sendTitle("\u00a74You have died!", "Soul Integrity dropped by 18%", 10, 50, 10);
+            player.teleport(new Location(player.getWorld(), -111.5, 104, 272.5));
+            player.sendTitle("\u00a74You have died!", "Soul Integrity dropped by 18%", 10, 50, 10);
             return damage;
         }
         health -= amount;
         // damage indicator
         lastDamage = System.currentTimeMillis();
         Vector adjustment = new Vector(0, entity.getHeight() - 1.75, 0);
+        adjustment.add(new Vector(Math.random() - 0.5, Math.random() / 2, Math.random() - 0.5));
         Location entityLoc = entity.getLocation().add(adjustment);
         ArmorStand indicatorEntity = (ArmorStand) entityLoc.getWorld().spawnEntity(entityLoc, EntityType.ARMOR_STAND);
         indicatorEntity.setCustomNameVisible(true);
@@ -273,10 +280,13 @@ public class Stats {
         if (itemId == null || rpgItem == null) {
             if (slot.equals("weapon")) {
                 // you can use anything as a "weapon" it just deals no damage
-                unequip("weapon", false);
                 return null;
             }
             return "Invalid Item!";
+        }
+        if (!rpgItem.type.equals(slot)) {
+            // right thing in wrong slot
+            return null;
         }
         // check of stats fulfilled
         if (level < rpgItem.reqLevel) {
@@ -313,86 +323,94 @@ public class Stats {
                 break;
         }
         setMaxHealth(maxHealth);
-        if (entity instanceof Player) {
-            ((Player) entity).getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
+        if (player != null) {
+            player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
             Util.setWalkSpeed((Player) entity, 0.2f * (100 + build.getBonusWalkSpeed()) / 100f);
             if (!slot.equals("weapon")) {
-                equip(((Player) entity).getInventory().getItemInMainHand(), "weapon");
+                equip(player.getInventory().getItemInMainHand(), "weapon");
             }
         }
         return null;
     }
 
-    public void unequip(String slot) {
-        unequip(slot, true);
-    }
-
-    public void unequip(String slot, boolean recompute) {
-        // yes just reset the whole build ez
-        System.out.println("unequip " + slot);
-        if (recompute) {
-            HashMap<String, ItemStack> buildItems = new HashMap<>();
-            buildItems.put("helmet", build.getHelmet());
-            buildItems.put("chestplate", build.getChestplate());
-            buildItems.put("leggings", build.getLeggings());
-            buildItems.put("boots", build.getBoots());
-            buildItems.put("weapon", build.getWeapon());
-            buildItems.remove(slot);
-            buildItems.values().removeAll(Collections.singletonList(null));
+    public void resetBuild(boolean send) {
+        long start = System.nanoTime();
+        if (player != null) {
+            PlayerInventory inv = player.getInventory();
+            Map<String, ItemStack> items = new HashMap<>();
+            items.put("helmet", inv.getHelmet());
+            items.put("chestplate", inv.getChestplate());
+            items.put("leggings", inv.getLeggings());
+            items.put("boots", inv.getBoots());
+            items.put("weapon", inv.getItemInMainHand());
+            items.keySet().removeIf(key -> items.get(key) == null);
+            int hash = items.hashCode() + powerSkill + defenseSkill + speedSkill + intelligenceSkill;
+            if (hash == buildHash) {
+                return;
+            }
+            buildHash = hash;
             build.setHelmet(null);
             build.setChestplate(null);
             build.setLeggings(null);
             build.setBoots(null);
             build.setWeapon(null);
-            while (true) {
-                int count = 0;
-                for (Iterator<String> iterator = buildItems.keySet().iterator(); iterator.hasNext(); ) {
-                    String key = iterator.next();
-                    if (equip(buildItems.get(key), key) == null) {
-                        ++count;
-                        iterator.remove();
-                    }
+            while (items.keySet().removeIf(key -> this.equip(items.get(key), key) == null));
+            for (String key : items.keySet()) {
+                if (send || !key.equals("weapon")) {
+                    player.sendMessage("\u00a7c" + equip(items.get(key), key));
                 }
-                if (count == 0 || buildItems.isEmpty()) {
-                    break;
+                ItemStack air = new ItemStack(Material.AIR);
+                switch (key) {
+                    case "helmet":
+                        if (inv.addItem(inv.getHelmet()).isEmpty()) {
+                            inv.setHelmet(air);
+                        }
+                        break;
+                    case "chestplate":
+                        if (inv.addItem(inv.getChestplate()).isEmpty()) {
+                            inv.setChestplate(air);
+                        }
+                        break;
+                    case "leggings":
+                        if (inv.addItem(inv.getLeggings()).isEmpty()) {
+                            inv.setLeggings(air);
+                        }
+                        break;
+                    case "boots":
+                        if (inv.addItem(inv.getBoots()).isEmpty()) {
+                            inv.setBoots(air);
+                        }
+                        break;
                 }
             }
-            for (String key : buildItems.keySet()) {
-                ItemStack item = buildItems.get(key);
-                String error = equip(item, key);
-                entity.sendMessage("\u00a7c" + error);
-                if (entity instanceof Player && !slot.equals("weapon")) {
-                    Player player = (Player) entity;
-                    PlayerInventory inv = player.getInventory();
-                    if (inv.addItem(item).isEmpty()) {
-                        inv.setItem(SLOTS.get(key), new ItemStack(Material.AIR));
-                    }
-                }
-            }
-        } else {
-            switch (slot) {
-                case "helmet":
-                    build.setHelmet(null);
-                    break;
-                case "chestplate":
-                    build.setChestplate(null);
-                    break;
-                case "leggings":
-                    build.setLeggings(null);
-                    break;
-                case "boots":
-                    build.setBoots(null);
-                    break;
-                case "weapon":
-                    build.setWeapon(null);
-                    break;
-            }
+        }
+        System.out.println(System.nanoTime() - start);
+    }
+
+    private void unequip(String slot) {
+        // yes just reset the whole build ez
+        switch (slot) {
+            case "helmet":
+                build.setHelmet(null);
+                break;
+            case "chestplate":
+                build.setChestplate(null);
+                break;
+            case "leggings":
+                build.setLeggings(null);
+                break;
+            case "boots":
+                build.setBoots(null);
+                break;
+            case "weapon":
+                build.setWeapon(null);
+                break;
         }
         setMaxHealth(maxHealth);
         heal(0);
-        if (entity instanceof Player) {
-            ((Player) entity).getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
-            Util.setWalkSpeed(((Player) entity), 0.2f * (100 + build.getBonusWalkSpeed()) / 100f);
+        if (player != null) {
+            player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
+            Util.setWalkSpeed(player, 0.2f * (100 + build.getBonusWalkSpeed()) / 100f);
         }
     }
 
@@ -405,8 +423,8 @@ public class Stats {
             freeSkill += 3;
             setMaxHealth(maxHealth + 10);
             fullHeal();
-            if (entity instanceof Player) {
-                ((Player) entity).getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(getMaxHearts() * 2);
+            if (player != null) {
+                player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(getMaxHearts() * 2);
             }
         }
     }
@@ -420,8 +438,8 @@ public class Stats {
             this.intelligenceSkill += intelligenceSkill;
             this.freeSkill -= total;
             double speedAttribute = 0.2 * (100 + SKILL_TABLE[this.speedSkill]) / 100;
-            if (entity instanceof Player) {
-//                ((Player) entity).setWalkSpeed((float) speedAttribute);
+            if (player != null) {
+//                player.setWalkSpeed((float) speedAttribute);
             }
         }
     }
@@ -432,8 +450,8 @@ public class Stats {
         defenseSkill = 0;
         speedSkill = 0;
         intelligenceSkill = 0;
-        if (entity instanceof Player) {
-            Util.setWalkSpeed(((Player) entity), 0.2f);
+        if (player != null) {
+            Util.setWalkSpeed(player, 0.2f);
         }
     }
 
@@ -503,19 +521,19 @@ public class Stats {
     }
 
     public int getEffectivePowerSkill() {
-        return powerSkill + build.getBaseBonusPower();
+        return Math.max(0, Math.min(400, powerSkill + build.getBaseBonusPower()));
     }
 
     public int getEffectiveDefenseSkill() {
-        return defenseSkill + build.getBaseBonusDefense();
+        return Math.max(0, Math.min(400, defenseSkill + build.getBaseBonusDefense()));
     }
 
     public int getEffectiveSpeedSkill() {
-        return speedSkill + build.getBaseBonusSpeed();
+        return Math.max(0, Math.min(400, speedSkill + build.getBaseBonusSpeed()));
     }
 
     public int getEffectiveIntelligenceSkill() {
-        return intelligenceSkill + build.getBaseBonusIntelligence();
+        return Math.max(0, Math.min(400, intelligenceSkill + build.getBaseBonusIntelligence()));
     }
 
     public int getFreeSkill() {
@@ -549,6 +567,18 @@ public class Stats {
 
     public void setDeaths(int deaths) {
         this.deaths = deaths;
+    }
+
+    public Build getBuild() {
+        return build;
+    }
+
+    public boolean isXpAwarded() {
+        return xpAwarded;
+    }
+
+    public void setXpAwarded(boolean xpAwarded) {
+        this.xpAwarded = xpAwarded;
     }
 
     public static Stats extractFromEntity(Entity entity) {
