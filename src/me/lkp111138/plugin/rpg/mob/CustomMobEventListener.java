@@ -1,18 +1,23 @@
 package me.lkp111138.plugin.rpg.mob;
 
+import me.lkp111138.plugin.Main;
 import me.lkp111138.plugin.rpg.Stats;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 public class CustomMobEventListener implements Listener {
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onDamage(EntityDamageEvent event) {
+        if (event.getCause() != EntityDamageEvent.DamageCause.CUSTOM) {
+            System.out.println("high");
+        }
         Entity entity = event.getEntity();
         if (Stats.extractFromEntity(entity) != null) {
             switch (event.getCause()) {
@@ -46,7 +51,7 @@ public class CustomMobEventListener implements Listener {
         Entity damagee = event.getEntity();
         Stats damagerStat = Stats.extractFromEntity(damager);
         Stats damageeStat = Stats.extractFromEntity(damagee);
-        if (damagerStat == null || damageeStat == null) {
+        if (damagerStat == null || damageeStat == null || event.getCause() != EntityDamageEvent.DamageCause.CUSTOM) {
             return;
         }
         if (damagee instanceof LivingEntity) {
@@ -60,7 +65,15 @@ public class CustomMobEventListener implements Listener {
                         CustomMob customMob = CustomMob.extractFromEntity(damagee);
                         if (customMob != null) {
                             // TODO log all damagers and spread the xp
-                            damagerStat.addXP(customMob.getXP());
+                            int xp = customMob.getXP();
+                            damagerStat.addXP(xp);
+                            Location loc = damagee.getLocation();
+                            ArmorStand xpEntity = (ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
+                            xpEntity.setVisible(false);
+                            xpEntity.setInvulnerable(true);
+                            xpEntity.setCustomNameVisible(true);
+                            xpEntity.setCustomName("+" + xp + " XP");
+                            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), xpEntity::remove, 40);
                         }
                     }
                 }

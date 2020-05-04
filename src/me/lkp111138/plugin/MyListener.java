@@ -92,7 +92,6 @@ public class MyListener implements Listener {
 
     @EventHandler
     public void onPlayerLeave(PlayerQuitEvent event) {
-        // TODO save data
         Player player = event.getPlayer();
         Stats stats = Stats.extractFromEntity(player);
         if (stats != null) {
@@ -117,35 +116,38 @@ public class MyListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerAttack(PlayerInteractEntityEvent event) {
-        Player player = event.getPlayer();
-        if (event.getHand() != EquipmentSlot.HAND) {
-            return;
+    void onPlayerAttack(PlayerAnimationEvent event) {
+        if (event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
+            System.out.println("normal swing");
+            onPlayerAttack(event.getPlayer());
         }
-        event.setCancelled(onPlayerAttack(player));
     }
 
     private boolean onPlayerAttack(Player player) {
         // all mobs within 3.5 blocks and a 30 degree cone
         Location playerLoc = player.getLocation();
-        Vector playerVector = playerLoc.toVector();
-        Vector playerDirection = playerLoc.getDirection();
+        Vector playerDir = player.getLocation().getDirection();
         Collection<Entity> entities = player.getWorld().getNearbyEntities(playerLoc, 4, 4, 4);
         boolean hit = false;
         for (Entity entity : entities) {
-            if (entity == player || entity instanceof Villager) {
+            if (entity == player || CustomMob.extractFromEntity(entity) == null) {
                 // lets not self harm
                 continue;
             }
             Vector entityLoc = entity.getLocation().toVector();
             entityLoc.add(new Vector(0, entity.getHeight() / 2 - 0.9, 0));
-            Vector entityDirection = entityLoc.add(playerVector.multiply(-1)).normalize();
-            double crossProdSq = entityDirection.crossProduct(playerDirection).lengthSquared();
-            player.sendMessage(String.valueOf(crossProdSq));
-            if (crossProdSq < 0.25) { // sin 30deg = 0.5
-                EntityDamageByEntityEvent e = new EntityDamageByEntityEvent(player, entity, EntityDamageEvent.DamageCause.ENTITY_ATTACK, 1);
-                Bukkit.getPluginManager().callEvent(e);
-                hit = true;
+            Vector entityDir = entityLoc.clone().add(player.getLocation().toVector().multiply(-1)).normalize();
+            double crossSq = playerDir.clone().crossProduct(entityDir).lengthSquared();
+            double distSq = playerDir.distanceSquared(entityDir);
+            player.sendMessage(String.format("%.4f; %.4f; %.4f,%.4f,%.4f; %.4f,%.4f,%.4f", crossSq, entityDir.distanceSquared(playerDir), playerDir.getX(), playerDir.getY(), playerDir.getZ(), entityDir.getX(), entityDir.getY(), entityDir.getZ()));
+            entity.setCustomName(String.format("%.4f; %.4f", crossSq, distSq));
+            if (crossSq < 0.25) { // sin 30deg = 0.5
+                if (distSq < 1) { // we also don't want to hit mobs behind us
+                    EntityDamageByEntityEvent e = new EntityDamageByEntityEvent(player, entity, EntityDamageEvent.DamageCause.CUSTOM, 1);
+                    ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 2, 0));
+                    Bukkit.getPluginManager().callEvent(e);
+                    hit = true;
+                }
             }
         }
         return hit;
