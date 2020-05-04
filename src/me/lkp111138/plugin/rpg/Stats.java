@@ -99,7 +99,6 @@ public class Stats {
 
     // owner of the stats
     private final Entity entity;
-    private float baseSpeed;
     private UUID uuid;
 
     // base defenses
@@ -316,9 +315,7 @@ public class Stats {
         setMaxHealth(maxHealth);
         if (entity instanceof Player) {
             ((Player) entity).getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
-            System.out.println(0.15f);
-            System.out.println(0.15f * (100 + build.getBonusWalkSpeed()) / 100f);
-            Util.setWalkSpeed((Player) entity, 0.15f * (100 + build.getBonusWalkSpeed()) / 100f);
+            Util.setWalkSpeed((Player) entity, 0.2f * (100 + build.getBonusWalkSpeed()) / 100f);
             if (!slot.equals("weapon")) {
                 equip(((Player) entity).getInventory().getItemInMainHand(), "weapon");
             }
@@ -395,7 +392,7 @@ public class Stats {
         heal(0);
         if (entity instanceof Player) {
             ((Player) entity).getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
-            Util.setWalkSpeed(((Player) entity), baseSpeed * (100 + build.getBonusWalkSpeed()) / 100f);
+            Util.setWalkSpeed(((Player) entity), 0.2f * (100 + build.getBonusWalkSpeed()) / 100f);
         }
     }
 
@@ -422,7 +419,7 @@ public class Stats {
             this.speedSkill += speedSkill;
             this.intelligenceSkill += intelligenceSkill;
             this.freeSkill -= total;
-            double speedAttribute = baseSpeed * (100 + SKILL_TABLE[this.speedSkill]) / 100;
+            double speedAttribute = 0.2 * (100 + SKILL_TABLE[this.speedSkill]) / 100;
             if (entity instanceof Player) {
 //                ((Player) entity).setWalkSpeed((float) speedAttribute);
             }
@@ -436,7 +433,7 @@ public class Stats {
         speedSkill = 0;
         intelligenceSkill = 0;
         if (entity instanceof Player) {
-            Util.setWalkSpeed(((Player) entity), baseSpeed);
+            Util.setWalkSpeed(((Player) entity), 0.2f);
         }
     }
 

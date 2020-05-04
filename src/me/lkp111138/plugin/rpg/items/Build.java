@@ -1,5 +1,6 @@
 package me.lkp111138.plugin.rpg.items;
 
+import me.lkp111138.plugin.Util;
 import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
