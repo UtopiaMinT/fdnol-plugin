@@ -7,6 +7,7 @@ import me.lkp111138.plugin.rpg.items.RpgItem;
 import me.lkp111138.plugin.rpg.mob.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -14,10 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerAnimationType;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -104,10 +102,18 @@ public class MyListener implements Listener {
     }
 
     @EventHandler
-    void onPlayerAttack(PlayerAnimationEvent event) {
+    public void onPlayerAttack(PlayerAnimationEvent event) {
         if (event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
             System.out.println("normal swing");
             onPlayerAttack(event.getPlayer());
+        }
+    }
+
+    @EventHandler
+    public void onInterractWithArmorStand(PlayerInteractEntityEvent event) {
+        if (event.getRightClicked() instanceof ArmorStand) {
+            // not cool equipping a stand with a helmet
+            event.setCancelled(true);
         }
     }
 
