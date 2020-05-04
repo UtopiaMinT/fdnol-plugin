@@ -1,8 +1,8 @@
 package me.lkp111138.plugin.command;
 
-import me.lkp111138.plugin.Util;
 import me.lkp111138.plugin.chestgui.ChestGui;
 import me.lkp111138.plugin.rpg.Stats;
+import me.lkp111138.plugin.util.Util;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

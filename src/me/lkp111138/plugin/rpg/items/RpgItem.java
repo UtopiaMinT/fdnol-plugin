@@ -1,7 +1,7 @@
 package me.lkp111138.plugin.rpg.items;
 
-import me.lkp111138.plugin.Util;
 import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
+import me.lkp111138.plugin.util.Util;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NBTTagInt;
 import net.minecraft.server.v1_12_R1.NBTTagString;

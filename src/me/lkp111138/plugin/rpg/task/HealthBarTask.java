@@ -1,7 +1,7 @@
 package me.lkp111138.plugin.rpg.task;
 
-import me.lkp111138.plugin.Util;
 import me.lkp111138.plugin.rpg.Stats;
+import me.lkp111138.plugin.util.Util;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;

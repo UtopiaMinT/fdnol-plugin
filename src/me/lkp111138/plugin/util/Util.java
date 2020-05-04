@@ -1,4 +1,4 @@
-package me.lkp111138.plugin;
+package me.lkp111138.plugin.util;
 
 import net.minecraft.server.v1_12_R1.ChatMessageType;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
