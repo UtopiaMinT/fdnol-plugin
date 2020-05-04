@@ -274,7 +274,7 @@ public class Stats {
         if (itemId == null || rpgItem == null) {
             if (slot.equals("weapon")) {
                 // you can use anything as a "weapon" it just deals no damage
-                unequip("weapon");
+                unequip("weapon", false);
                 return null;
             }
             return "Invalid Item!";
@@ -327,43 +327,68 @@ public class Stats {
     }
 
     public void unequip(String slot) {
+        unequip(slot, true);
+    }
+
+    public void unequip(String slot, boolean recompute) {
         // yes just reset the whole build ez
         System.out.println("unequip " + slot);
-        HashMap<String, ItemStack> buildItems = new HashMap<>();
-        buildItems.put("helmet", build.getHelmet());
-        buildItems.put("chestplate", build.getChestplate());
-        buildItems.put("leggings", build.getLeggings());
-        buildItems.put("boots", build.getBoots());
-        buildItems.remove(slot);
-        buildItems.values().removeAll(Collections.singletonList(null));
-        build.setHelmet(null);
-        build.setChestplate(null);
-        build.setLeggings(null);
-        build.setBoots(null);
-        build.setWeapon(null);
-        while (true) {
-            int count = 0;
-            for (Iterator<String> iterator = buildItems.keySet().iterator(); iterator.hasNext(); ) {
-                String key = iterator.next();
-                if (equip(buildItems.get(key), key) == null) {
-                    ++count;
-                    iterator.remove();
+        if (recompute) {
+            HashMap<String, ItemStack> buildItems = new HashMap<>();
+            buildItems.put("helmet", build.getHelmet());
+            buildItems.put("chestplate", build.getChestplate());
+            buildItems.put("leggings", build.getLeggings());
+            buildItems.put("boots", build.getBoots());
+            buildItems.put("weapon", build.getWeapon());
+            buildItems.remove(slot);
+            buildItems.values().removeAll(Collections.singletonList(null));
+            build.setHelmet(null);
+            build.setChestplate(null);
+            build.setLeggings(null);
+            build.setBoots(null);
+            build.setWeapon(null);
+            while (true) {
+                int count = 0;
+                for (Iterator<String> iterator = buildItems.keySet().iterator(); iterator.hasNext(); ) {
+                    String key = iterator.next();
+                    if (equip(buildItems.get(key), key) == null) {
+                        ++count;
+                        iterator.remove();
+                    }
+                }
+                if (count == 0 || buildItems.isEmpty()) {
+                    break;
                 }
             }
-            if (count == 0 || buildItems.isEmpty()) {
-                break;
-            }
-        }
-        for (String key : buildItems.keySet()) {
-            ItemStack item = buildItems.get(key);
-            String error = equip(item, key);
-            entity.sendMessage("\u00a7c" + error);
-            if (entity instanceof Player) {
-                Player player = (Player) entity;
-                PlayerInventory inv = player.getInventory();
-                if (inv.addItem(item).isEmpty()) {
-                    inv.setItem(SLOTS.get(key), new ItemStack(Material.AIR));
+            for (String key : buildItems.keySet()) {
+                ItemStack item = buildItems.get(key);
+                String error = equip(item, key);
+                entity.sendMessage("\u00a7c" + error);
+                if (entity instanceof Player && !slot.equals("weapon")) {
+                    Player player = (Player) entity;
+                    PlayerInventory inv = player.getInventory();
+                    if (inv.addItem(item).isEmpty()) {
+                        inv.setItem(SLOTS.get(key), new ItemStack(Material.AIR));
+                    }
                 }
+            }
+        } else {
+            switch (slot) {
+                case "helmet":
+                    build.setHelmet(null);
+                    break;
+                case "chestplate":
+                    build.setChestplate(null);
+                    break;
+                case "leggings":
+                    build.setLeggings(null);
+                    break;
+                case "boots":
+                    build.setBoots(null);
+                    break;
+                case "weapon":
+                    build.setWeapon(null);
+                    break;
             }
         }
         setMaxHealth(maxHealth);
