@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class Stats {
-    // TODO apply items and apply bonuses
     private static final double K = 0.261648041296;
     private static final double A = 1.79654388542;
     private static final int MAX_LEVEL = 100;
@@ -270,7 +269,7 @@ public class Stats {
         return effective;
     }
 
-    public String equip(ItemStack item, String slot) {
+    private String equip(ItemStack item, String slot) {
         if (item == null || item.getType() == Material.AIR) {
             return null;
         }
@@ -322,19 +321,15 @@ public class Stats {
                 build.setWeapon(item);
                 break;
         }
-        setMaxHealth(maxHealth);
         if (player != null) {
             player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
             Util.setWalkSpeed((Player) entity, 0.2f * (100 + build.getBonusWalkSpeed()) / 100f);
-            if (!slot.equals("weapon")) {
-                equip(player.getInventory().getItemInMainHand(), "weapon");
-            }
         }
         return null;
     }
 
     public void resetBuild(boolean send) {
-        long start = System.nanoTime();
+//        long start = System.nanoTime();
         if (player != null) {
             PlayerInventory inv = player.getInventory();
             Map<String, ItemStack> items = new HashMap<>();
@@ -383,35 +378,11 @@ public class Stats {
                         break;
                 }
             }
+            Util.setWalkSpeed(player, 0.002f * (100 + build.getBonusWalkSpeed()));
+            heal(0);
+            setMaxHealth(maxHealth);
         }
-        System.out.println(System.nanoTime() - start);
-    }
-
-    private void unequip(String slot) {
-        // yes just reset the whole build ez
-        switch (slot) {
-            case "helmet":
-                build.setHelmet(null);
-                break;
-            case "chestplate":
-                build.setChestplate(null);
-                break;
-            case "leggings":
-                build.setLeggings(null);
-                break;
-            case "boots":
-                build.setBoots(null);
-                break;
-            case "weapon":
-                build.setWeapon(null);
-                break;
-        }
-        setMaxHealth(maxHealth);
-        heal(0);
-        if (player != null) {
-            player.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
-            Util.setWalkSpeed(player, 0.2f * (100 + build.getBonusWalkSpeed()) / 100f);
-        }
+//        System.out.println("resetBuild: " + (System.nanoTime() - start));
     }
 
     public void addXP(long amount) {
@@ -491,7 +462,7 @@ public class Stats {
     }
 
     public ElementalDamage getMeleeDamage() {
-        ElementalDamage damage = this.build.getBaseDamage().getDamage();
+        ElementalDamage damage = this.build.getBaseDamage().add(this.damage, 1).getDamage();
         damage.earth *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectivePowerSkill()] + build.getBonusMeleePercent() + build.getBonusEarthDamage()) / 100;
         damage.water *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveIntelligenceSkill()] + build.getBonusMeleePercent() + build.getBonusWaterDamage()) / 100;
         damage.wind *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveSpeedSkill()] + build.getBonusMeleePercent() + build.getBonusWindDamage()) / 100;

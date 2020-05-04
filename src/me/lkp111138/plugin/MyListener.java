@@ -99,7 +99,6 @@ public class MyListener implements Listener {
     @EventHandler
     public void onPlayerAttack(PlayerAnimationEvent event) {
         if (event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
-            System.out.println("normal swing");
             onPlayerAttack(event.getPlayer());
         }
     }
@@ -128,8 +127,6 @@ public class MyListener implements Listener {
             Vector entityDir = entityLoc.clone().add(player.getLocation().toVector().multiply(-1)).normalize();
             double crossSq = playerDir.clone().crossProduct(entityDir).lengthSquared();
             double distSq = playerDir.distanceSquared(entityDir);
-            player.sendMessage(String.format("%.4f; %.4f; %.4f,%.4f,%.4f; %.4f,%.4f,%.4f", crossSq, entityDir.distanceSquared(playerDir), playerDir.getX(), playerDir.getY(), playerDir.getZ(), entityDir.getX(), entityDir.getY(), entityDir.getZ()));
-            entity.setCustomName(String.format("%.4f; %.4f", crossSq, distSq));
             if (crossSq < 0.25) { // sin 30deg = 0.5
                 if (distSq < 1) { // we also don't want to hit mobs behind us
                     EntityDamageByEntityEvent e = new EntityDamageByEntityEvent(player, entity, EntityDamageEvent.DamageCause.CUSTOM, 1);
