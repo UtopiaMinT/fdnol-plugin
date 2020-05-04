@@ -36,6 +36,3 @@ commands:
     usage: "\u00a7cUsage: /rpgitem <give|fix> [args...]"
     aliases:
       - ri
-  calc:
-    description: calc
-    usage: "/calc x y z"
