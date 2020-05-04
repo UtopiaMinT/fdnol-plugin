@@ -99,7 +99,7 @@ public class Util {
 
 
     public static String nToString(int n, boolean color) {
-        if (n > 0) {
+        if (n >= 0) {
             return (color ? "\u00a7a" : "") + "+" + n;
         } else {
             return (color ? "\u00a7c" : "") + n;
