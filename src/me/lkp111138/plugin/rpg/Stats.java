@@ -202,11 +202,11 @@ public class Stats {
     public double damage(ElementalDamage elementalDamage) {
         // apply skills
         ElementalDefense effectiveDefense = getEffectiveElementalDefense();
-        elementalDamage.neutral = (int) Math.max(0, elementalDamage.neutral * (100 - SKILL_TABLE[defenseSkill]) / 100);
-        elementalDamage.wind = (int) Math.max(0, (elementalDamage.wind - effectiveDefense.wind) * (100 - SKILL_TABLE[defenseSkill]) / 100);
-        elementalDamage.fire = (int) Math.max(0, (elementalDamage.fire - effectiveDefense.fire) * (100 - SKILL_TABLE[defenseSkill]) / 100);
-        elementalDamage.earth = (int) Math.max(0, (elementalDamage.earth - effectiveDefense.earth) * (100 - SKILL_TABLE[defenseSkill]) / 100);
-        elementalDamage.water = (int) Math.max(0, (elementalDamage.water - effectiveDefense.water) * (100 - SKILL_TABLE[defenseSkill]) / 100);
+        elementalDamage.neutral = (int) Math.max(0, elementalDamage.neutral * (100 - SKILL_TABLE[defenseSkill]) / 100.0);
+        elementalDamage.wind = (int) Math.max(0, (elementalDamage.wind - effectiveDefense.wind) * (100 - SKILL_TABLE[defenseSkill]) / 100.0);
+        elementalDamage.fire = (int) Math.max(0, (elementalDamage.fire - effectiveDefense.fire) * (100 - SKILL_TABLE[defenseSkill]) / 100.0);
+        elementalDamage.earth = (int) Math.max(0, (elementalDamage.earth - effectiveDefense.earth) * (100 - SKILL_TABLE[defenseSkill]) / 100.0);
+        elementalDamage.water = (int) Math.max(0, (elementalDamage.water - effectiveDefense.water) * (100 - SKILL_TABLE[defenseSkill]) / 100.0);
         double amount = elementalDamage.sum();
         if (health < amount && player != null) {
             // players don't really die, they get a death stat and get tped to spawn instead
@@ -496,7 +496,8 @@ public class Stats {
         damage.water *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveIntelligenceSkill()] + build.getBonusMeleePercent() + build.getBonusWaterDamage()) / 100;
         damage.wind *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveSpeedSkill()] + build.getBonusMeleePercent() + build.getBonusWindDamage()) / 100;
         damage.fire *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + SKILL_TABLE[getEffectiveDefenseSkill()] + build.getBonusMeleePercent() + build.getBonusFireDamage()) / 100;
-        damage.neutral *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + build.getBonusMeleePercent()) / 100 + build.getBonusMeleeNeutral();
+        damage.neutral *= (100 + SKILL_TABLE[getEffectivePowerSkill()] + build.getBonusMeleePercent()) / 100;
+        damage.neutral += build.getBonusMeleeNeutral();
         return damage;
     }
 

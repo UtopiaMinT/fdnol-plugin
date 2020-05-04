@@ -2,6 +2,7 @@ package me.lkp111138.plugin.rpg.mob;
 
 import me.lkp111138.plugin.Main;
 import me.lkp111138.plugin.rpg.Stats;
+import me.lkp111138.plugin.rpg.damage.ElementalDamage;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
@@ -56,7 +57,8 @@ public class CustomMobEventListener implements Listener {
             return;
         }
         if (damagee instanceof LivingEntity) {
-            double damageInHalfHearts = damageeStat.damage(damagerStat.getMeleeDamage());
+            ElementalDamage meleeDamage = damagerStat.getMeleeDamage();
+            double damageInHalfHearts = damageeStat.damage(meleeDamage);
             if (!(damagee instanceof Player)) {
                 if (damageeStat.getHealth() > 0) {
                     ((LivingEntity) damagee).damage(0.0001);
