@@ -6,7 +6,6 @@ import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import me.lkp111138.plugin.rpg.defense.ElementalDefense;
 import me.lkp111138.plugin.rpg.items.Build;
 import me.lkp111138.plugin.rpg.items.RpgItem;
-import me.lkp111138.plugin.util.ItemCooldownUtil;
 import me.lkp111138.plugin.util.Util;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -86,18 +85,7 @@ public class Stats {
             85.04, 85.12, 85.19, 85.27, 85.34, 85.41, 85.49, 85.56, 85.63, 85.70,
             85.77, 85.84, 85.91, 85.98, 86.05, 86.12, 86.19, 86.26, 86.33, 86.40, 86.47
     };
-    public static Map<String, Integer> SLOTS = new HashMap<String, Integer>() {{
-        put("helmet", 5);
-        put("chestplate", 6);
-        put("leggings", 7);
-        put("boots", 8);
-    }};
-    public static Map<Integer, String> SLOTS_REVERSE = new HashMap<Integer, String>() {{
-        put(5, "helmet");
-        put(6, "chestplate");
-        put(7, "leggings");
-        put(8, "boots");
-    }};
+    public static int[] WEAPON_COOLDOWN = {48, 32, 22, 15, 11, 8, 5};
 
     // owner of the stats
     private final Entity entity;

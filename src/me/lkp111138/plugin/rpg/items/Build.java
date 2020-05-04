@@ -23,6 +23,7 @@ public class Build {
     private int baseFireDefense;
     private int baseWindDefense;
     private int baseWaterDefense;
+    private int baseAttackSpeed;
     private ElementalDamageRange baseDamage = new ElementalDamageRange();
 
     // bonuses
@@ -39,6 +40,7 @@ public class Build {
     private int bonusHealthRegen;
     private int bonusHealth;
     private int bonusWalkSpeed;
+    private int bonusAttackSpeed;
 
     public ItemStack getHelmet() {
         return helmet;
@@ -142,6 +144,7 @@ public class Build {
         baseFireDefense += multiplier * rpgItem.baseFireDefense;
         baseWindDefense += multiplier * rpgItem.baseWindDefense;
         baseWaterDefense += multiplier * rpgItem.baseWaterDefense;
+        baseAttackSpeed += multiplier * rpgItem.baseAttackSpeed;
         baseDamage = baseDamage.add(rpgItem.baseDamage, multiplier);
         // bonus
         bonusMeleePercent += multiplier * Util.properValueForStats(rpgItem.bonusMeleePercent, rpg.getInt("MeleePercent"));
@@ -157,6 +160,7 @@ public class Build {
         bonusHealthRegen += multiplier * Util.properValueForStats(rpgItem.bonusHealthRegen, rpg.getInt("HealthRegen"));
         bonusHealth += multiplier * Util.properValueForStats(rpgItem.bonusHealth, rpg.getInt("Health"));
         bonusWalkSpeed += multiplier * Util.properValueForStats(rpgItem.bonusWalkSpeed, rpg.getInt("WalkSpeed"));
+        bonusAttackSpeed += multiplier * Util.properValueForStats(rpgItem.bonusAttackSpeed, rpg.getInt("AttackSpeed"));
     }
 
     public int getBaseBonusPower() {
@@ -193,6 +197,10 @@ public class Build {
 
     public int getBaseWaterDefense() {
         return baseWaterDefense;
+    }
+
+    public int getBaseAttackSpeed() {
+        return baseAttackSpeed;
     }
 
     public ElementalDamageRange getBaseDamage() {
@@ -249,5 +257,9 @@ public class Build {
 
     public int getBonusWalkSpeed() {
         return bonusWalkSpeed;
+    }
+
+    public int getBonusAttackSpeed() {
+        return bonusAttackSpeed;
     }
 }

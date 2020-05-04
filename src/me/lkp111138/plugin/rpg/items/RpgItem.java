@@ -43,6 +43,7 @@ public class RpgItem {
     public final int baseFireDefense;
     public final int baseWindDefense;
     public final int baseWaterDefense;
+    public final int baseAttackSpeed;
     public final ElementalDamageRange baseDamage;
 
     // bonuses
@@ -59,6 +60,7 @@ public class RpgItem {
     public final int bonusHealthRegen;
     public final int bonusHealth;
     public final int bonusWalkSpeed;
+    public final int bonusAttackSpeed;
 
     public final String id;
     public final String name;
@@ -82,6 +84,13 @@ public class RpgItem {
     }
 
     public RpgItem(String id, ConfigurationSection section) {
+        this.id = id;
+        this.name = section.getString("name");
+        this.type = section.getString("type");
+        this.texture = section.getString("texture");
+        this.color = section.getString("color");
+        this.tier = section.getString("tier");
+
         this.reqPower = section.getInt("req.power");
         this.reqDefense = section.getInt("req.defense");
         this.reqSpeed = section.getInt("req.speed");
@@ -97,6 +106,7 @@ public class RpgItem {
         this.baseFireDefense = section.getInt("base.fireDefense");
         this.baseWindDefense = section.getInt("base.windDefense");
         this.baseWaterDefense = section.getInt("base.waterDefense");
+        this.baseAttackSpeed = this.type.equals("weapon") ? section.getInt("base.attackSpeed") : 0;
         this.baseDamage = ElementalDamageRange.fromConfig(section.getConfigurationSection("base.damage"));
 
         this.bonusMeleePercent = section.getInt("stats.meleePercent");
@@ -112,13 +122,8 @@ public class RpgItem {
         this.bonusHealthRegen = section.getInt("stats.healthRegen");
         this.bonusHealth = section.getInt("stats.health");
         this.bonusWalkSpeed = section.getInt("stats.walkSpeed");
+        this.bonusAttackSpeed = section.getInt("stats.attackSpeed");
 
-        this.id = id;
-        this.name = section.getString("name");
-        this.type = section.getString("type");
-        this.texture = section.getString("texture");
-        this.color = section.getString("color");
-        this.tier = section.getString("tier");
         String[] lore = section.getString("lore").split(" ");
         this.lore = new ArrayList<>();
         StringBuilder line = new StringBuilder("\u00a78").append(lore[0]);
@@ -166,6 +171,7 @@ public class RpgItem {
         int lines = 0;
         // base stats
         if (baseDamage != null) {
+            lore.add("§7Attack Speed: " + baseAttackSpeed);
             if (baseDamage.maxNeutral > 0) {
                 lore.add(String.format("§6Neutral§7 Damage: %.0f-%.0f", baseDamage.minNeutral, baseDamage.maxNeutral));
             }
@@ -237,7 +243,14 @@ public class RpgItem {
         net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         NBTTagCompound compound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
         NBTTagCompound rpg = compound.getCompound("RPG");
-        if (bonusMeleePercent > 0) {
+        // roll missing stats
+        if (rpg.getInt("AttackSpeed") == 0) {
+            rpg.setInt("AttackSpeed", getRollFor(bonusAttackSpeed));
+            compound.set("RPG", rpg);
+            nmsStack.setTag(compound);
+            itemStack = CraftItemStack.asBukkitCopy(nmsStack);
+        }
+        if (bonusMeleePercent != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusMeleePercent, rpg.getInt("MeleePercent")), true) + "% \u00a77Melee Damage");
         }
         if (bonusMeleeNeutral > 0) {
@@ -276,9 +289,8 @@ public class RpgItem {
         if (bonusWalkSpeed > 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusWalkSpeed, rpg.getInt("WalkSpeed")), true) + "% \u00a77Walk Speed");
         }
-
-        if (lore.size() > lines) {
-            lore.add("");
+        if (bonusAttackSpeed != 0) {
+            lore.add(Util.nToString(Util.properValueForStats(bonusAttackSpeed, rpg.getInt("AttackSpeed")), true) + " Tier \u00a77Attack Speed");
         }
 
         if (lore.size() > lines) {
@@ -314,6 +326,7 @@ public class RpgItem {
         rpg.set("HealthRegen", new NBTTagInt(getRollFor(bonusHealthRegen)));
         rpg.set("Health", new NBTTagInt(getRollFor(bonusHealth)));
         rpg.set("WalkSpeed", new NBTTagInt(getRollFor(bonusWalkSpeed)));
+        rpg.set("AttackSpeed", new NBTTagInt(getRollFor(bonusAttackSpeed)));
         rpg.set("ITEM_ID", new NBTTagString(id));
         compound.set("RPG", rpg);
         compound.set("HideFlags", new NBTTagInt(63));

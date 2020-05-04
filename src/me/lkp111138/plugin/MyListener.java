@@ -3,11 +3,16 @@ package me.lkp111138.plugin;
 import me.lkp111138.plugin.rpg.Stats;
 import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import me.lkp111138.plugin.rpg.defense.ElementalDefense;
+import me.lkp111138.plugin.rpg.items.Build;
 import me.lkp111138.plugin.rpg.items.RpgItem;
 import me.lkp111138.plugin.rpg.mob.CustomMob;
 import me.lkp111138.plugin.util.Util;
+import net.minecraft.server.v1_12_R1.Item;
+import net.minecraft.server.v1_12_R1.ItemCooldown;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -30,6 +35,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
+
+import static me.lkp111138.plugin.rpg.Stats.WEAPON_COOLDOWN;
 
 public class MyListener implements Listener {
     @EventHandler
@@ -106,7 +113,7 @@ public class MyListener implements Listener {
     @EventHandler
     public void onPlayerAttack(PlayerAnimationEvent event) {
         if (event.getAnimationType() == PlayerAnimationType.ARM_SWING) {
-            onPlayerAttack(event.getPlayer());
+            event.setCancelled(onPlayerAttack(event.getPlayer()));
         }
     }
 
@@ -119,11 +126,26 @@ public class MyListener implements Listener {
     }
 
     private boolean onPlayerAttack(Player player) {
+        // set cooldown on weapon
+        Stats stats = Stats.extractFromEntity(player);
+        if (stats == null) {
+            return true; // hit with no stats?
+        }
+        Build build = stats.getBuild();
+        ItemStack item = build.getWeapon();
+        if (item != null) {
+            int attackSpeed = Math.max(0, Math.min(6, build.getBaseAttackSpeed() + build.getBonusAttackSpeed()));
+            ItemCooldown tracker = ((CraftPlayer) player).getHandle().getCooldownTracker();
+            Item item1 = CraftMagicNumbers.getItem(item.getType());
+            if (tracker.a(item1)) {
+                return true; // still in cd
+            }
+            tracker.a(item1, WEAPON_COOLDOWN[attackSpeed]);
+        }
         // all mobs within 3.5 blocks and a 30 degree cone
         Location playerLoc = player.getLocation();
         Vector playerDir = player.getLocation().getDirection();
         Collection<Entity> entities = player.getWorld().getNearbyEntities(playerLoc, 4, 4, 4);
-        boolean hit = false;
         for (Entity entity : entities) {
             if (entity == player || CustomMob.extractFromEntity(entity) == null) {
                 // lets not self harm
@@ -139,11 +161,10 @@ public class MyListener implements Listener {
                     EntityDamageByEntityEvent e = new EntityDamageByEntityEvent(player, entity, EntityDamageEvent.DamageCause.CUSTOM, 1);
                     ((LivingEntity) entity).addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 2, 0));
                     Bukkit.getPluginManager().callEvent(e);
-                    hit = true;
                 }
             }
         }
-        return hit;
+        return false;
     }
 
     private void sendEquipErrorString(Player p, String s) {
