@@ -26,9 +26,9 @@ public class CommandSkills implements CommandExecutor {
                 return true;
             }
 //            ChestGui gui = new ChestGui("Skills - " + stats.getFreeSkill() + " Points remaining", 27);
-            ChestGui gui = new ChestGui("Skills - " + stats.getFreeSkill() + " Points remaining", 9);
+            ChestGui gui = new ChestGui("Skills - " + stats.getFreeSkill() + " Points remaining", 9, player);
             reset(gui, stats, player);
-            gui.open(player);
+            gui.open();
         }
         return true;
     }
@@ -40,7 +40,7 @@ public class CommandSkills implements CommandExecutor {
         gui.set(8, new ChestGui.Slot(resetItem, event -> {
             stats.resetSkills();
             reset(gui, stats, player);
-            gui.rename(player, "Skills - " + stats.getFreeSkill() + " Points remaining");
+            gui.rename("Skills - " + stats.getFreeSkill() + " Points remaining");
         }));
         int strengthSkill = stats.getRawPowerSkill();
         int bonusStrengthSkill = stats.getBuild().getBaseBonusPower();
@@ -72,7 +72,7 @@ public class CommandSkills implements CommandExecutor {
         _p[i] = p;
         stats.allocate(_p[0], _p[1], _p[2], _p[3]);
         reset(gui, stats, player);
-        gui.rename(player, "Skills - " + stats.getFreeSkill() + " Points remaining");
+        gui.rename("Skills - " + stats.getFreeSkill() + " Points remaining");
     }
 
     private ItemStack skillBook(String skill, int skillCount, int bonusSkill, int freeSkill) {

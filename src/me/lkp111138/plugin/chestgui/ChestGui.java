@@ -11,16 +11,17 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public class ChestGui {
     private String name;
     private final Slot[] slots;
+    private final Player player;
     private Inventory inventory;
-    private boolean open;
+    private int layers = 0;
 
-    public ChestGui(String name, int size) {
+    public ChestGui(String name, int size, Player player) {
         this.name = name;
+        this.player = player;
         if (size % 9 != 0) {
             throw new RuntimeException("size % 9 != 0");
         }
@@ -47,32 +48,33 @@ public class ChestGui {
         return slots[i].handler;
     }
 
-    public void open(Player player) {
+    public void open() {
+        ++layers;
+        System.out.println("open " + name + " " + layers);
         inventory = Bukkit.getServer().createInventory(null, slots.length, name);
         inventory.setContents(Arrays.stream(slots).map(x -> x.itemStack).toArray(ItemStack[]::new));
         player.setMetadata("chestgui", new FixedMetadataValue(Main.getInstance(), this));
         player.openInventory(inventory);
-        open = true;
     }
 
-    public void rename(Player player, String newName) {
-        name = newName;
-//        player.closeInventory();
-        if (open) {
-            open(player);
+    public void close() {
+        --layers;
+        System.out.println("close " + name + " " + layers);
+        if (layers == 0) {
+            player.removeMetadata("chestgui", Main.getInstance());
         }
     }
 
-    public boolean sameAs(Inventory inventory) {
-        return Objects.equals(inventory, this.inventory);
-    }
-
-    void setOpen(boolean open) {
-        this.open = open;
+    public void rename(String newName) {
+        name = newName;
+//        player.closeInventory();
+        if (isOpen()) {
+            open();
+        }
     }
 
     public boolean isOpen() {
-        return open;
+        return layers > 0;
     }
 
     public static class Slot {

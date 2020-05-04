@@ -13,9 +13,9 @@ public class CommandChestGui implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            ChestGui gui = new ChestGui("Test", 9);
+            ChestGui gui = new ChestGui("Test", 9, player);
             gui.set(4, new ChestGui.Slot(new ItemStack(Material.DIAMOND), null));
-            gui.open(player);
+            gui.open();
         }
         return true;
     }

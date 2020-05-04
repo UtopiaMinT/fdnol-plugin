@@ -1,6 +1,5 @@
 package me.lkp111138.plugin.chestgui;
 
-import me.lkp111138.plugin.Main;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -19,11 +18,9 @@ public class ChestGuiEventListener implements Listener {
             ChestGui gui = ChestGui.extractFromEntity(clicker);
             if (gui != null) {
                 event.setCancelled(true);
-                if (gui.sameAs(clickedInventory)) {
-                    ChestClickHandler handler = gui.getHandler(event.getRawSlot());
-                    if (handler != null) {
-                        handler.handle(event);
-                    }
+                ChestClickHandler handler = gui.getHandler(event.getRawSlot());
+                if (handler != null) {
+                    handler.handle(event);
                 }
             }
         }
@@ -37,10 +34,7 @@ public class ChestGuiEventListener implements Listener {
             Player closer = (Player) _closer;
             ChestGui gui = ChestGui.extractFromEntity(closer);
             if (gui != null) {
-                if (gui.sameAs(closed)) {
-                    gui.setOpen(false);
-                }
-                closer.removeMetadata("chestgui", Main.getInstance());
+                gui.close();
             }
         }
     }
