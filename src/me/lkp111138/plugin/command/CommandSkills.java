@@ -14,9 +14,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CommandSkills implements CommandExecutor {
+    private Set<Player> pendingReset = new HashSet<>();
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
@@ -34,14 +37,22 @@ public class CommandSkills implements CommandExecutor {
     }
 
     private void reset(ChestGui gui, Stats stats, Player player) {
-        ItemStack resetItem = new ItemStack(Material.BARRIER);
-        ItemMeta meta = resetItem.getItemMeta();
-        meta.setDisplayName("\u00a7cReset");
-        gui.set(8, new ChestGui.Slot(resetItem, event -> {
-            stats.resetSkills();
-            reset(gui, stats, player);
-            gui.rename("Skills - " + stats.getFreeSkill() + " Points remaining");
-        }));
+        if (!pendingReset.contains(player)) {
+            ItemStack resetItem = resetItem();
+            gui.set(8, new ChestGui.Slot(resetItem, event -> {
+                pendingReset.add(player);
+                reset(gui, stats, player);
+                gui.rename("Skills - " + stats.getFreeSkill() + " Points remaining");
+            }));
+        } else {
+            ItemStack resetItem = confirmResetItem();
+            gui.set(8, new ChestGui.Slot(resetItem, event -> {
+                pendingReset.remove(player);
+                stats.resetSkills();
+                reset(gui, stats, player);
+                gui.rename("Skills - " + stats.getFreeSkill() + " Points remaining");
+            }));
+        }
         int strengthSkill = stats.getRawPowerSkill();
         int bonusStrengthSkill = stats.getBuild().getBaseBonusPower();
         ItemStack strengthBook = skillBook("Strength", strengthSkill, bonusStrengthSkill, stats.getFreeSkill());
@@ -109,5 +120,22 @@ public class CommandSkills implements CommandExecutor {
         meta.setLore(lore);
         book.setItemMeta(meta);
         return book;
+    }
+
+    private ItemStack resetItem() {
+        ItemStack item = new ItemStack(Material.BARRIER);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName("\u00a7cReset");
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private ItemStack confirmResetItem() {
+        ItemStack item = new ItemStack(Material.WOOL);
+        ItemMeta meta = item.getItemMeta();
+        item.setDurability((short) 5);
+        meta.setDisplayName("\u00a7cConfirm Reset");
+        item.setItemMeta(meta);
+        return item;
     }
 }
