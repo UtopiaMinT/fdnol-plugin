@@ -1,5 +1,6 @@
 package me.lkp111138.plugin.chestgui;
 
+import me.lkp111138.plugin.Main;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +40,7 @@ public class ChestGuiEventListener implements Listener {
                 if (gui.sameAs(closed)) {
                     gui.setOpen(false);
                 }
+                closer.removeMetadata("chestgui", Main.getInstance());
             }
         }
     }

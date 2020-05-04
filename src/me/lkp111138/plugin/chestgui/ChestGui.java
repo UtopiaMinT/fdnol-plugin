@@ -88,7 +88,7 @@ public class ChestGui {
     public static ChestGui extractFromEntity(Entity entity) {
         if (entity instanceof Player) {
             for (MetadataValue value : entity.getMetadata("chestgui")) {
-                if (value.getOwningPlugin().equals(Main.getInstance())) {
+                if (Main.getInstance().equals(value.getOwningPlugin())) {
                     return (ChestGui) value.value();
                 }
             }
