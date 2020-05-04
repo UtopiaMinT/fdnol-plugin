@@ -4,21 +4,20 @@ import me.lkp111138.plugin.rpg.Stats;
 import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import me.lkp111138.plugin.rpg.defense.ElementalDefense;
 import me.lkp111138.plugin.rpg.items.RpgItem;
+import me.lkp111138.plugin.rpg.mob.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -34,6 +33,7 @@ public class MyListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player joined = event.getPlayer();
+        System.out.println(joined.getWalkSpeed());
         joined.sendMessage("\u00a76Five demands, not one less.");
         joined.setCollidable(false);
         joined.setInvulnerable(true);
@@ -101,18 +101,6 @@ public class MyListener implements Listener {
                 e.printStackTrace();
             }
         }
-    }
-
-    @EventHandler
-    public void onPlayerAttack(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        if (event.getHand() != EquipmentSlot.HAND) {
-            return;
-        }
-        if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) {
-            return;
-        }
-        event.setCancelled(onPlayerAttack(player));
     }
 
     @EventHandler
