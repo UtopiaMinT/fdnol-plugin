@@ -318,7 +318,7 @@ public class Stats {
             ((Player) entity).getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
             System.out.println(0.15f);
             System.out.println(0.15f * (100 + build.getBonusWalkSpeed()) / 100f);
-            ((Player) entity).setWalkSpeed(Math.max(0, Math.min(1, 0.15f * (100 + build.getBonusWalkSpeed()) / 100f)));
+            Util.setWalkSpeed((Player) entity, 0.15f * (100 + build.getBonusWalkSpeed()) / 100f);
             if (!slot.equals("weapon")) {
                 equip(((Player) entity).getInventory().getItemInMainHand(), "weapon");
             }
@@ -395,7 +395,7 @@ public class Stats {
         heal(0);
         if (entity instanceof Player) {
             ((Player) entity).getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(-200);
-            ((Player) entity).setWalkSpeed(baseSpeed * (100 + build.getBonusWalkSpeed()) / 100f);
+            Util.setWalkSpeed(((Player) entity), baseSpeed * (100 + build.getBonusWalkSpeed()) / 100f);
         }
     }
 
@@ -436,7 +436,7 @@ public class Stats {
         speedSkill = 0;
         intelligenceSkill = 0;
         if (entity instanceof Player) {
-            ((Player) entity).setWalkSpeed((float) baseSpeed);
+            Util.setWalkSpeed(((Player) entity), baseSpeed);
         }
     }
 

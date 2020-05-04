@@ -83,4 +83,9 @@ public class Util {
     public static String capitalize(String s) {
         return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
     }
+
+    public static void setWalkSpeed(Player player, float speed) {
+        player.setWalkSpeed(Math.max(0, Math.min(1, speed)));
+    }
+
 }
