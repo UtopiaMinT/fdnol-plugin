@@ -1,7 +1,7 @@
 package me.lkp111138.plugin.rpg.task;
 
 import me.lkp111138.plugin.rpg.Stats;
-import me.lkp111138.plugin.util.Util;
+import me.lkp111138.plugin.util.NMSUtil;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -40,7 +40,7 @@ public class HealthBarTask implements Runnable {
                         entity.setHealth(Math.min(stats.getHealthHalfHearts(), stats.getMaxHearts() * 2));
                         Player player = (Player) entity;
                         player.setFoodLevel(20);
-                        Util.sendActionBar(player, String.format("\u00a74❤ %.0f / %.0f", stats.getHealth(), stats.getMaxHealth()));
+                        NMSUtil.sendActionBar(player, String.format("\u00a74❤ %.0f / %.0f", stats.getHealth(), stats.getMaxHealth()));
                     }
                     if (save) {
                         try {

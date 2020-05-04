@@ -6,13 +6,10 @@ import me.lkp111138.plugin.rpg.defense.ElementalDefense;
 import me.lkp111138.plugin.rpg.items.Build;
 import me.lkp111138.plugin.rpg.items.RpgItem;
 import me.lkp111138.plugin.rpg.mob.CustomMob;
+import me.lkp111138.plugin.util.NMSUtil;
 import me.lkp111138.plugin.util.Util;
-import net.minecraft.server.v1_12_R1.Item;
-import net.minecraft.server.v1_12_R1.ItemCooldown;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -135,12 +132,9 @@ public class MyListener implements Listener {
         ItemStack item = build.getWeapon();
         if (item != null) {
             int attackSpeed = Math.max(0, Math.min(6, build.getBaseAttackSpeed() + build.getBonusAttackSpeed()));
-            ItemCooldown tracker = ((CraftPlayer) player).getHandle().getCooldownTracker();
-            Item item1 = CraftMagicNumbers.getItem(item.getType());
-            if (tracker.a(item1)) {
-                return true; // still in cd
+            if (!NMSUtil.trySetItemCooldown(player, item.getType(), WEAPON_COOLDOWN[attackSpeed])) {
+                return true;
             }
-            tracker.a(item1, WEAPON_COOLDOWN[attackSpeed]);
         }
         // all mobs within 3.5 blocks and a 30 degree cone
         Location playerLoc = player.getLocation();

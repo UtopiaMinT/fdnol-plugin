@@ -1,12 +1,7 @@
 package me.lkp111138.plugin.util;
 
-import net.minecraft.server.v1_12_R1.ChatMessageType;
-import net.minecraft.server.v1_12_R1.IChatBaseComponent;
-import net.minecraft.server.v1_12_R1.PacketPlayOutChat;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 
@@ -40,28 +35,6 @@ public class Util {
             return 2;
         }
         return 1;
-    }
-
-    public static Object getPrivateField(String fieldName, Class clazz, Object object) {
-        Field field;
-        Object o = null;
-
-        try {
-            field = clazz.getDeclaredField(fieldName);
-            field.setAccessible(true);
-            o = field.get(object);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        return o;
-    }
-
-    @SuppressWarnings("rawtypes")
-    public static void sendActionBar(Player player, String message) {
-        IChatBaseComponent cbc = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + message + "\"}");
-        PacketPlayOutChat ppoc = new PacketPlayOutChat(cbc, ChatMessageType.GAME_INFO);
-        ((CraftPlayer)player).getHandle().playerConnection.sendPacket(ppoc);
     }
 
     public static byte[] getBytesFromUUID(UUID uuid) {
