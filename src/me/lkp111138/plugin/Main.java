@@ -8,7 +8,6 @@ import me.lkp111138.plugin.npc.NPC;
 import me.lkp111138.plugin.npc.NPCEventListener;
 import me.lkp111138.plugin.npc.task.TrackingTask;
 import me.lkp111138.plugin.rpg.items.RpgItem;
-import me.lkp111138.plugin.rpg.items.RpgItemEventListener;
 import me.lkp111138.plugin.rpg.mob.CustomMob;
 import me.lkp111138.plugin.rpg.mob.CustomMobEventListener;
 import me.lkp111138.plugin.rpg.task.HealthBarTask;
@@ -90,7 +89,6 @@ public class Main extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new NPCEventListener(), this);
         this.getServer().getPluginManager().registerEvents(new CustomMobEventListener(), this);
         this.getServer().getPluginManager().registerEvents(new ChestGuiEventListener(), this);
-        this.getServer().getPluginManager().registerEvents(new RpgItemEventListener(), this);
     }
 
     @Override
