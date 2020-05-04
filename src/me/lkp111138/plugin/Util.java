@@ -88,4 +88,11 @@ public class Util {
         player.setWalkSpeed(Math.max(0, Math.min(1, speed)));
     }
 
+    public static int properValueForStats(int base, int roll) {
+        int value = (int) (base * roll / 100.0 + 0.5);
+        if (value == 0) {
+            return (int) Math.signum(base);
+        }
+        return value;
+    }
 }

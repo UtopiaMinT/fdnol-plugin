@@ -143,19 +143,19 @@ public class Build {
         baseWaterDefense += multiplier * rpgItem.baseWaterDefense;
         baseDamage = baseDamage.add(rpgItem.baseDamage, multiplier);
         // bonus
-        bonusMeleePercent += multiplier * (int) (rpgItem.bonusMeleePercent * rpg.getInt("MeleePercent") / 100.0);
-        bonusMeleeNeutral += multiplier * (int) (rpgItem.bonusMeleeNeutral * rpg.getInt("MeleeNeutral") / 100.0);
-        bonusEarthDefense += multiplier * (int) (rpgItem.bonusEarthDefense * rpg.getInt("EarthDefense") / 100.0);
-        bonusFireDefense += multiplier * (int) (rpgItem.bonusFireDefense * rpg.getInt("FireDefense") / 100.0);
-        bonusWindDefense += multiplier * (int) (rpgItem.bonusWindDefense * rpg.getInt("WindDefense") / 100.0);
-        bonusWaterDefense += multiplier * (int) (rpgItem.bonusWaterDefense * rpg.getInt("WaterDefense") / 100.0);
-        bonusEarthDamage += multiplier * (int) (rpgItem.bonusEarthDamage * rpg.getInt("EarthDamage") / 100.0);
-        bonusFireDamage += multiplier * (int) (rpgItem.bonusFireDamage * rpg.getInt("FireDamage") / 100.0);
-        bonusWindDamage += multiplier * (int) (rpgItem.bonusWindDamage * rpg.getInt("WindDamage") / 100.0);
-        bonusWaterDamage += multiplier * (int) (rpgItem.bonusWaterDamage * rpg.getInt("WaterDamage") / 100.0);
-        bonusHealthRegen += multiplier * (int) (rpgItem.bonusHealthRegen * rpg.getInt("HealthRegen") / 100.0);
-        bonusHealth += multiplier * (int) (rpgItem.bonusHealth * rpg.getInt("Health") / 100.0);
-        bonusWalkSpeed += multiplier * (int) (rpgItem.bonusWalkSpeed * rpg.getInt("WalkSpeed") / 100.0);
+        bonusMeleePercent += multiplier * Util.properValueForStats(rpgItem.bonusMeleePercent, rpg.getInt("MeleePercent"));
+        bonusMeleeNeutral += multiplier * Util.properValueForStats(rpgItem.bonusMeleeNeutral, rpg.getInt("MeleeNeutral"));
+        bonusEarthDefense += multiplier * Util.properValueForStats(rpgItem.bonusEarthDefense, rpg.getInt("EarthDefense"));
+        bonusFireDefense += multiplier * Util.properValueForStats(rpgItem.bonusFireDefense, rpg.getInt("FireDefense"));
+        bonusWindDefense += multiplier * Util.properValueForStats(rpgItem.bonusWindDefense, rpg.getInt("WindDefense"));
+        bonusWaterDefense += multiplier * Util.properValueForStats(rpgItem.bonusWaterDefense, rpg.getInt("WaterDefense"));
+        bonusEarthDamage += multiplier * Util.properValueForStats(rpgItem.bonusEarthDamage, rpg.getInt("EarthDamage"));
+        bonusFireDamage += multiplier * Util.properValueForStats(rpgItem.bonusFireDamage, rpg.getInt("FireDamage"));
+        bonusWindDamage += multiplier * Util.properValueForStats(rpgItem.bonusWindDamage, rpg.getInt("WindDamage"));
+        bonusWaterDamage += multiplier * Util.properValueForStats(rpgItem.bonusWaterDamage, rpg.getInt("WaterDamage"));
+        bonusHealthRegen += multiplier * Util.properValueForStats(rpgItem.bonusHealthRegen, rpg.getInt("HealthRegen"));
+        bonusHealth += multiplier * Util.properValueForStats(rpgItem.bonusHealth, rpg.getInt("Health"));
+        bonusWalkSpeed += multiplier * Util.properValueForStats(rpgItem.bonusWalkSpeed, rpg.getInt("WalkSpeed"));
     }
 
     public int getBaseBonusPower() {
