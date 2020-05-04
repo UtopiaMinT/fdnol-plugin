@@ -183,31 +183,31 @@ public class RpgItem {
             }
         }
         if (baseHealth != 0) {
-            lore.add("\u00a7r\u00a74HP " + nToString(baseHealth));
+            lore.add("\u00a7r\u00a74HP " + Util.nToString(baseHealth));
         }
         if (baseEarthDefense != 0) {
-            lore.add("§r§2Earth defense §7" + nToString(baseEarthDefense));
+            lore.add("§r§2Earth defense §7" + Util.nToString(baseEarthDefense));
         }
         if (baseFireDefense != 0) {
-            lore.add("§r§cFire defense §7" + nToString(baseFireDefense));
+            lore.add("§r§cFire defense §7" + Util.nToString(baseFireDefense));
         }
         if (baseWindDefense != 0) {
-            lore.add("§r§7Wind defense §7" + nToString(baseWindDefense));
+            lore.add("§r§7Wind defense §7" + Util.nToString(baseWindDefense));
         }
         if (baseWaterDefense != 0) {
-            lore.add("§r§bWater defense §7" + nToString(baseWaterDefense));
+            lore.add("§r§bWater defense §7" + Util.nToString(baseWaterDefense));
         }
         if (baseBonusPower != 0) {
-            lore.add(nToString(baseBonusPower, true) + "\u00a77 Power");
+            lore.add(Util.nToString(baseBonusPower, true) + "\u00a77 Power");
         }
         if (baseBonusDefense != 0) {
-            lore.add(nToString(baseBonusDefense, true) + "\u00a77 Defense");
+            lore.add(Util.nToString(baseBonusDefense, true) + "\u00a77 Defense");
         }
         if (baseBonusSpeed != 0) {
-            lore.add(nToString(baseBonusSpeed, true) + "\u00a77 Speed");
+            lore.add(Util.nToString(baseBonusSpeed, true) + "\u00a77 Speed");
         }
         if (baseBonusIntelligence != 0) {
-            lore.add(nToString(baseBonusIntelligence, true) + "\u00a77 Intelligence");
+            lore.add(Util.nToString(baseBonusIntelligence, true) + "\u00a77 Intelligence");
         }
         if (lore.size() > lines) {
             lore.add("");
@@ -238,43 +238,43 @@ public class RpgItem {
         NBTTagCompound compound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
         NBTTagCompound rpg = compound.getCompound("RPG");
         if (bonusMeleePercent > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusMeleePercent, rpg.getInt("MeleePercent")), true) + "% \u00a77Melee Damage");
+            lore.add(Util.nToString(Util.properValueForStats(bonusMeleePercent, rpg.getInt("MeleePercent")), true) + "% \u00a77Melee Damage");
         }
         if (bonusMeleeNeutral > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusMeleeNeutral, rpg.getInt("MeleeNeutral")), true) + " \u00a77Melee Damage");
+            lore.add(Util.nToString(Util.properValueForStats(bonusMeleeNeutral, rpg.getInt("MeleeNeutral")), true) + " \u00a77Melee Damage");
         }
         if (bonusEarthDefense > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusEarthDefense, rpg.getInt("EarthDefense")), true) + "% \u00a77Earth Defense");
+            lore.add(Util.nToString(Util.properValueForStats(bonusEarthDefense, rpg.getInt("EarthDefense")), true) + "% \u00a77Earth Defense");
         }
         if (bonusFireDefense > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusFireDefense, rpg.getInt("FireDefense")), true) + "% \u00a77Fire Defense");
+            lore.add(Util.nToString(Util.properValueForStats(bonusFireDefense, rpg.getInt("FireDefense")), true) + "% \u00a77Fire Defense");
         }
         if (bonusWindDefense > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusWindDefense, rpg.getInt("WindDefense")), true) + "% \u00a77Wind Defense");
+            lore.add(Util.nToString(Util.properValueForStats(bonusWindDefense, rpg.getInt("WindDefense")), true) + "% \u00a77Wind Defense");
         }
         if (bonusWaterDefense > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusWaterDefense, rpg.getInt("WaterDefense")), true) + "% \u00a77Water Defense");
+            lore.add(Util.nToString(Util.properValueForStats(bonusWaterDefense, rpg.getInt("WaterDefense")), true) + "% \u00a77Water Defense");
         }
         if (bonusEarthDamage > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusEarthDamage, rpg.getInt("EarthDamage")), true) + "% \u00a77Earth Damage");
+            lore.add(Util.nToString(Util.properValueForStats(bonusEarthDamage, rpg.getInt("EarthDamage")), true) + "% \u00a77Earth Damage");
         }
         if (bonusFireDamage > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusFireDamage, rpg.getInt("FireDamage")), true) + "% \u00a77Fire Damage");
+            lore.add(Util.nToString(Util.properValueForStats(bonusFireDamage, rpg.getInt("FireDamage")), true) + "% \u00a77Fire Damage");
         }
         if (bonusWindDamage > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusWindDamage, rpg.getInt("WindDamage")), true) + "% \u00a77Wind Damage");
+            lore.add(Util.nToString(Util.properValueForStats(bonusWindDamage, rpg.getInt("WindDamage")), true) + "% \u00a77Wind Damage");
         }
         if (bonusWaterDamage > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusWaterDamage, rpg.getInt("WaterDamage")), true) + "% \u00a77Water Damage");
+            lore.add(Util.nToString(Util.properValueForStats(bonusWaterDamage, rpg.getInt("WaterDamage")), true) + "% \u00a77Water Damage");
         }
         if (bonusHealthRegen > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusHealthRegen, rpg.getInt("HealthRegen")), true) + " \u00a77Health Regen");
+            lore.add(Util.nToString(Util.properValueForStats(bonusHealthRegen, rpg.getInt("HealthRegen")), true) + " \u00a77Health Regen");
         }
         if (bonusHealth > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusHealth, rpg.getInt("Health")), true) + " \u00a77Health");
+            lore.add(Util.nToString(Util.properValueForStats(bonusHealth, rpg.getInt("Health")), true) + " \u00a77Health");
         }
         if (bonusWalkSpeed > 0) {
-            lore.add(nToString(Util.properValueForStats(bonusWalkSpeed, rpg.getInt("WalkSpeed")), true) + "% \u00a77Walk Speed");
+            lore.add(Util.nToString(Util.properValueForStats(bonusWalkSpeed, rpg.getInt("WalkSpeed")), true) + "% \u00a77Walk Speed");
         }
 
         if (lore.size() > lines) {
@@ -329,18 +329,6 @@ public class RpgItem {
         } else {
             return (int) (negativeMin + (negativeMax - negativeMin + 1) * Math.random());
         }
-    }
-
-    private String nToString(int n, boolean color) {
-        if (n > 0) {
-            return (color ? "\u00a7a" : "") + "+" + n;
-        } else {
-            return (color ? "\u00a7c" : "") + n;
-        }
-    }
-
-    private String nToString(int n) {
-        return nToString(n, false);
     }
 
     private ItemStack getItem() {
