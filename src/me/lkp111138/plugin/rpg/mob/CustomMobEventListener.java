@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.util.Vector;
 
 public class CustomMobEventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
@@ -63,17 +64,24 @@ public class CustomMobEventListener implements Listener {
                     ((LivingEntity) damagee).damage(999999);
                     if (damager instanceof Player) {
                         CustomMob customMob = CustomMob.extractFromEntity(damagee);
-                        if (customMob != null) {
-                            // TODO log all damagers and spread the xp
-                            int xp = customMob.getXP();
-                            damagerStat.addXP(xp);
-                            Location loc = damagee.getLocation();
-                            ArmorStand xpEntity = (ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
-                            xpEntity.setVisible(false);
-                            xpEntity.setInvulnerable(true);
-                            xpEntity.setCustomNameVisible(true);
-                            xpEntity.setCustomName("+" + xp + " XP");
-                            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), xpEntity::remove, 40);
+                        if (!damageeStat.isXpAwarded()) {
+                            damageeStat.setXpAwarded(true);
+                            if (customMob != null) {
+                                // TODO log all damagers and spread the xp
+                                int xp = customMob.getXP();
+                                damagerStat.addXP(xp);
+                                Location loc = damagee.getLocation();
+                                Vector adjustment = new Vector(0, damagee.getHeight() - 1.75, 0);
+                                adjustment.add(new Vector(Math.random() - 0.5, Math.random() / 2, Math.random() - 0.5));
+
+                                ArmorStand xpEntity = (ArmorStand) loc.getWorld().spawnEntity(loc.add(adjustment), EntityType.ARMOR_STAND);
+                                xpEntity.setVisible(false);
+                                xpEntity.setInvulnerable(true);
+                                xpEntity.setCustomNameVisible(true);
+                                xpEntity.setGravity(false);
+                                xpEntity.setCustomName("+" + xp + " XP");
+                                Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Main.getInstance(), xpEntity::remove, 40);
+                            }
                         }
                     }
                 }
