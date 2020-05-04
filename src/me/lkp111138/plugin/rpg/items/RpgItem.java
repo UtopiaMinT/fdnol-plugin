@@ -253,40 +253,40 @@ public class RpgItem {
         if (bonusMeleePercent != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusMeleePercent, rpg.getInt("MeleePercent")), true) + "% \u00a77Melee Damage");
         }
-        if (bonusMeleeNeutral > 0) {
+        if (bonusMeleeNeutral != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusMeleeNeutral, rpg.getInt("MeleeNeutral")), true) + " \u00a77Melee Damage");
         }
-        if (bonusEarthDefense > 0) {
+        if (bonusEarthDefense != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusEarthDefense, rpg.getInt("EarthDefense")), true) + "% \u00a77Earth Defense");
         }
-        if (bonusFireDefense > 0) {
+        if (bonusFireDefense != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusFireDefense, rpg.getInt("FireDefense")), true) + "% \u00a77Fire Defense");
         }
-        if (bonusWindDefense > 0) {
+        if (bonusWindDefense != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusWindDefense, rpg.getInt("WindDefense")), true) + "% \u00a77Wind Defense");
         }
-        if (bonusWaterDefense > 0) {
+        if (bonusWaterDefense != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusWaterDefense, rpg.getInt("WaterDefense")), true) + "% \u00a77Water Defense");
         }
-        if (bonusEarthDamage > 0) {
+        if (bonusEarthDamage != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusEarthDamage, rpg.getInt("EarthDamage")), true) + "% \u00a77Earth Damage");
         }
-        if (bonusFireDamage > 0) {
+        if (bonusFireDamage != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusFireDamage, rpg.getInt("FireDamage")), true) + "% \u00a77Fire Damage");
         }
-        if (bonusWindDamage > 0) {
+        if (bonusWindDamage != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusWindDamage, rpg.getInt("WindDamage")), true) + "% \u00a77Wind Damage");
         }
-        if (bonusWaterDamage > 0) {
+        if (bonusWaterDamage != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusWaterDamage, rpg.getInt("WaterDamage")), true) + "% \u00a77Water Damage");
         }
-        if (bonusHealthRegen > 0) {
+        if (bonusHealthRegen != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusHealthRegen, rpg.getInt("HealthRegen")), true) + " \u00a77Health Regen");
         }
-        if (bonusHealth > 0) {
+        if (bonusHealth != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusHealth, rpg.getInt("Health")), true) + " \u00a77Health");
         }
-        if (bonusWalkSpeed > 0) {
+        if (bonusWalkSpeed != 0) {
             lore.add(Util.nToString(Util.properValueForStats(bonusWalkSpeed, rpg.getInt("WalkSpeed")), true) + "% \u00a77Walk Speed");
         }
         if (bonusAttackSpeed != 0) {
