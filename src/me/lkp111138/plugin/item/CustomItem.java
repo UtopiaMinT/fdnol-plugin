@@ -45,8 +45,9 @@ public class CustomItem {
         itemRegistry.put(id, this);
     }
 
-    public ItemStack getItemStack() {
+    public ItemStack getItemStack(int amount) {
         ItemStack itemStack = new ItemStack(material);
+        itemStack.setAmount(amount);
         itemStack.setDurability((short) damage);
         ItemMeta meta = itemStack.getItemMeta();
         meta.setDisplayName("\u00a7r" + name);
@@ -71,6 +72,18 @@ public class CustomItem {
         compound.set("CustomItemId", new NBTTagString(id));
         nmsStack.setTag(compound);
         return CraftItemStack.asBukkitCopy(nmsStack);
+    }
+
+    public ItemStack getItemStack() {
+        return getItemStack(1);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public static CustomItem getItem(String id) {
