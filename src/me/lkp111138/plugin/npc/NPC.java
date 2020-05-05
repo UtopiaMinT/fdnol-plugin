@@ -74,15 +74,23 @@ public class NPC {
                         return;
                     }
                     QuestProgress progress = stats.getQuestProgress().get(quest.id);
-                    Quest.QuestStage currentStage;
-                    if (progress == null) {
-                        currentStage = null;
-                    } else {
+                    Quest.QuestStage currentStage = null;
+                    if (progress != null) {
                         if (progress.getStage() == -1) {
                             // todo check for repeatable quest and reset progress
-                            return;
+                            if (quest.cooldown > 0) {
+                                if (progress.getTimestamp() < System.currentTimeMillis() - quest.cooldown * 1000) {
+                                    progress = null;
+                                    currentStage = null;
+                                    stats.getQuestProgress().remove(quest.id);
+                                } else {
+                                    Util.sendQuestDialog(clicker, quest.cooldownHint);
+                                }
+                            }
                         }
-                        currentStage = quest.stages.get(progress.getStage());
+                        if (progress != null) {
+                            currentStage = quest.stages.get(progress.getStage());
+                        }
                     }
                     if (npc.id == quest.startNPC || (currentStage != null && npc.id == currentStage.npc)) {
                         // try to advance in quest

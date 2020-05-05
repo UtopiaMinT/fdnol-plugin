@@ -23,6 +23,7 @@ public class Quest {
     public final List<String> reqLevelHint;
     public final List<String> reqItemsHint;
     public final List<String> reqQuestsHint;
+    public final List<String> cooldownHint;
     public final int cooldown;
     public final List<QuestStage> stages;
     public final int rewardXP;
@@ -60,6 +61,7 @@ public class Quest {
         this.reqItemsHint = section.getStringList("req_hint.items");
         this.reqQuests = section.getStringList("req.quest");
         this.reqQuestsHint = section.getStringList("req_hint.quest");
+        this.cooldownHint = section.getStringList("cooldown_hint");
         this.cooldown = section.getInt("cooldown");
         this.rewardXP = section.getInt("reward.xp");
         Map<CustomItem, Integer> rewardItems = new HashMap<>();
