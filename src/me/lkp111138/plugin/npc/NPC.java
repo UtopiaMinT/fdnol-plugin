@@ -79,16 +79,16 @@ public class NPC {
                         if (progress.getStage() == -1) {
                             if (quest.cooldown > 0) {
                                 if (progress.getTimestamp() < System.currentTimeMillis() - quest.cooldown * 1000) {
-                                    progress = null;
-                                    currentStage = null;
                                     stats.getQuestProgress().remove(quest.id);
                                 } else {
                                     Util.sendQuestDialog(clicker, quest.unavailableHint);
+                                    return;
                                 }
                             } else {
                                 Util.sendQuestDialog(clicker, quest.unavailableHint);
                                 return;
                             }
+                            progress = null;
                         }
                         if (progress != null) {
                             currentStage = quest.stages.get(progress.getStage());
