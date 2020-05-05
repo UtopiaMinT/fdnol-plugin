@@ -23,7 +23,7 @@ public class Quest {
     public final List<String> reqLevelHint;
     public final List<String> reqItemsHint;
     public final List<String> reqQuestsHint;
-    public final List<String> cooldownHint;
+    public final List<String> unavailableHint;
     public final int cooldown;
     public final List<QuestStage> stages;
     public final int rewardXP;
@@ -61,7 +61,7 @@ public class Quest {
         this.reqItemsHint = section.getStringList("req_hint.items");
         this.reqQuests = section.getStringList("req.quest");
         this.reqQuestsHint = section.getStringList("req_hint.quest");
-        this.cooldownHint = section.getStringList("cooldown_hint");
+        this.unavailableHint = section.getStringList("unavailable_hint");
         this.cooldown = section.getInt("cooldown");
         this.rewardXP = section.getInt("reward.xp");
         Map<CustomItem, Integer> rewardItems = new HashMap<>();
@@ -112,7 +112,6 @@ public class Quest {
             this.reqItems = reqItems;
             Map<CustomItem, Integer> rewardItems = new HashMap<>();
             Map rewardItemSection = (Map) section.get("reward");
-            System.out.println(rewardItemSection);
             if (rewardItemSection != null) {
                 for (Object key : rewardItemSection.keySet()) {
                     CustomItem item = CustomItem.getItem((String) key);

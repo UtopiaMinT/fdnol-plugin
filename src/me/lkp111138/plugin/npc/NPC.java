@@ -77,15 +77,17 @@ public class NPC {
                     Quest.QuestStage currentStage = null;
                     if (progress != null) {
                         if (progress.getStage() == -1) {
-                            // todo check for repeatable quest and reset progress
                             if (quest.cooldown > 0) {
                                 if (progress.getTimestamp() < System.currentTimeMillis() - quest.cooldown * 1000) {
                                     progress = null;
                                     currentStage = null;
                                     stats.getQuestProgress().remove(quest.id);
                                 } else {
-                                    Util.sendQuestDialog(clicker, quest.cooldownHint);
+                                    Util.sendQuestDialog(clicker, quest.unavailableHint);
                                 }
+                            } else {
+                                Util.sendQuestDialog(clicker, quest.unavailableHint);
+                                return;
                             }
                         }
                         if (progress != null) {
@@ -113,7 +115,6 @@ public class NPC {
                             for (String reqQuest : quest.reqQuests) {
                                 if (!stats.getQuestProgress().containsKey(reqQuest)) {
                                     Util.sendQuestDialog(clicker, quest.reqQuestsHint);
-
                                     return;
                                 }
                             }
