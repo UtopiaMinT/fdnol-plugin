@@ -5,9 +5,11 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.*;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +67,7 @@ public class NPC {
     }
 
     public static void save() {
-        FileConfiguration config = Main.getInstance().getConfig();
+        FileConfiguration config = YamlConfiguration.loadConfiguration(new File(Main.getInstance().getDataFolder(), "npc.yml"));
         System.out.println(config.getKeys(false));
         config.set("npc", npcRegistry.values().stream().map(npc -> {
             Map m = new HashMap();
