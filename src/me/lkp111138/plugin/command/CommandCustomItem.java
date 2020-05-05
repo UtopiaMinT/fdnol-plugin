@@ -14,14 +14,22 @@ public class CommandCustomItem implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
-            CustomItem item = CustomItem.getItem(args[0]);
-            if (item != null) {
-                ((Player) sender).getInventory().addItem(item.getItemStack());
+            if (args.length > 0) {
+                CustomItem item = CustomItem.getItem(args[0]);
+                if (item != null) {
+                    int amount = 1;
+                    if (args.length > 1) {
+                        amount = Integer.parseInt(args[1]);
+                    }
+                    ((Player) sender).getInventory().addItem(item.getItemStack(amount));
+                } else {
+                    sender.sendMessage("\u00a7cNo such item: " + args[0]);
+                }
             } else {
-                sender.sendMessage("\u00a7cNo such me.lkp111138.plugin.item: " + args[0]);
+                sender.sendMessage("\u00a7cUsage: /customitem <id> [amount]");
             }
         } else {
-            System.out.println("Cannot give me.lkp111138.plugin.item to console");
+            sender.sendMessage("Cannot give item to console");
         }
         return true;
     }
