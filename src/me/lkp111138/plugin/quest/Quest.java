@@ -89,6 +89,7 @@ public class Quest {
         public final int npc;
         public final List<String> dialog;
         public final Map<CustomItem, Integer> reqItems;
+        public final Map<CustomItem, Integer> rewardItems;
         public final List<String> hint;
         public final boolean isFinal;
 
@@ -107,6 +108,18 @@ public class Quest {
                 }
             }
             this.reqItems = reqItems;
+            Map<CustomItem, Integer> rewardItems = new HashMap<>();
+            Map rewardItemSection = (Map) section.get("reward");
+            System.out.println(rewardItemSection);
+            if (rewardItemSection != null) {
+                for (Object key : rewardItemSection.keySet()) {
+                    CustomItem item = CustomItem.getItem((String) key);
+                    if (item != null) {
+                        rewardItems.put(item, (Integer) rewardItemSection.get(key));
+                    }
+                }
+            }
+            this.rewardItems = rewardItems;
             this.hint = (List<String>) section.get("hint");
             Quest last = npcQuests.put(startNPC, Quest.this);
             if (last != null && last != Quest.this) {

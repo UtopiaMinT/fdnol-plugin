@@ -142,7 +142,6 @@ public class NPC {
                             if (currentStage != null) {
                                 // enough items, can advance
                                 Util.sendQuestDialog(clicker, currentStage.dialog);
-
                                 if (currentStage.isFinal) {
                                     // completed quest, give rewards
                                     stats.addXP(quest.rewardXP);
@@ -160,6 +159,7 @@ public class NPC {
                                     progress.setStage(progress.getStage() + 1);
                                     clicker.sendMessage(Quest.advanceText);
                                 }
+                                currentStage.rewardItems.forEach((key, val) -> inv.addItem(key.getItemStack(val)));
                             } else {
                                 // enough items, can start
                                 Util.sendQuestDialog(clicker, quest.startDialog);
