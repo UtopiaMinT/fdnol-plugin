@@ -1,21 +1,21 @@
 package me.lkp111138.plugin.rpg.mob;
 
 import me.lkp111138.plugin.Main;
+import me.lkp111138.plugin.item.CustomItem;
 import me.lkp111138.plugin.rpg.Stats;
 import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import me.lkp111138.plugin.rpg.defense.ElementalDefense;
+import me.lkp111138.plugin.util.Pair;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class CustomMob {
     private String id;
@@ -27,6 +27,7 @@ public class CustomMob {
     private List<Integer> xp;
     private ElementalDefense elementalDefense;
     private Random random = new Random();
+    private List<Pair<CustomItem, Integer>> drops = new ArrayList<>();
 
     private static Map<String, CustomMob> mobRegistry = new HashMap<>();
 
@@ -39,6 +40,20 @@ public class CustomMob {
         this.regen = section.getDouble("regen");
         this.xp = section.getIntegerList("xp");
         this.elementalDefense = ElementalDefense.fromConfig(section.getConfigurationSection("defense"));
+        List dropList = section.getList("drops", new ArrayList<>());
+        for (Object o : dropList) {
+            try {
+                List list = (List) o;
+                String itemId = (String) list.get(0);
+                int chance = (int) list.get(1);
+                CustomItem item = CustomItem.getItem(itemId);
+                if (item == null) {
+                    continue;
+                }
+                this.drops.add(new Pair<>(item, chance));
+            } catch (ClassCastException ignored) {
+            }
+        }
 
         mobRegistry.put(this.id, this);
     }
@@ -77,6 +92,16 @@ public class CustomMob {
 
     public EntityType getType() {
         return type;
+    }
+
+    public List<ItemStack> getDrops() {
+        List<ItemStack> items = new ArrayList<>();
+        for (Pair<CustomItem, Integer> drop : this.drops) {
+            if (Math.random() * 100 < drop.getRight()) {
+                items.add(drop.getLeft().getItemStack());
+            }
+        }
+        return items;
     }
 
     public static CustomMob extractFromEntity(Entity entity) {
