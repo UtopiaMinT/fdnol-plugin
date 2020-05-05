@@ -164,7 +164,7 @@ public class NPC {
                                 // enough items, can start
                                 Util.sendQuestDialog(clicker, quest.startDialog);
                                 stats.getQuestProgress().put(quest.id, new QuestProgress(quest.id, 0, System.currentTimeMillis()));
-                                clicker.sendMessage(Quest.startedText);
+                                clicker.sendMessage(Quest.startedText.replaceAll("\\$\\{name}", quest.name));
                             }
                         }
                     }

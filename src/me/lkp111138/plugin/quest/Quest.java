@@ -94,7 +94,7 @@ public class Quest {
         public final boolean isFinal;
 
         @SuppressWarnings("unchecked")
-        public QuestStage(Map section, boolean isFinal) {
+        QuestStage(Map section, boolean isFinal) {
             this.npc = (int) section.get("npc");
             this.dialog = (List<String>) section.get("dialog");
             Map<CustomItem, Integer> reqItems = new HashMap<>();
