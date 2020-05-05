@@ -1,5 +1,6 @@
 package me.lkp111138.plugin;
 
+import me.lkp111138.plugin.quest.QuestProgress;
 import me.lkp111138.plugin.rpg.Stats;
 import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import me.lkp111138.plugin.rpg.defense.ElementalDefense;
@@ -37,7 +38,8 @@ public class MyListener implements Listener {
         Bukkit.getServer().getScheduler().runTaskAsynchronously(Main.getInstance(), () -> {
             try (Connection conn = Main.getInstance().getConnection()) {
                 PreparedStatement stmt = conn.prepareStatement("SELECT uuid, username, power_skill, defense_skill, speed_skill, intel_skill, free_skill, total_xp, deaths, health FROM player_stats WHERE uuid=?");
-                stmt.setBytes(1, Util.getBytesFromUUID(joined.getUniqueId()));
+                byte[] bytesUuid = Util.getBytesFromUUID(joined.getUniqueId());
+                stmt.setBytes(1, bytesUuid);
                 ResultSet rs = stmt.executeQuery();
                 Stats stats = new Stats(joined);
                 PlayerInventory inventory = joined.getInventory();
@@ -77,6 +79,15 @@ public class MyListener implements Listener {
                 joined.setMetadata("rpg", new FixedMetadataValue(Main.getInstance(), stats));
                 joined.setInvulnerable(false);
                 joined.removePotionEffect(PotionEffectType.INVISIBILITY);
+                stmt.close();
+
+                stmt = conn.prepareStatement("SELECT quest_id, stage, timestamp FROM quest_log WHERE uuid=?");
+                stmt.setBytes(1, bytesUuid);
+                rs = stmt.executeQuery();
+                while (rs.next()) {
+                    stats.getQuestProgress().put(rs.getString(1), new QuestProgress(rs.getString(1), rs.getInt(2), rs.getLong(3)));
+                }
+                stmt.close();
             } catch (SQLException e) {
                 e.printStackTrace();
                 joined.kickPlayer("Sorry, there was an error");
