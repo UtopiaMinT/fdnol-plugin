@@ -1,12 +1,21 @@
 package me.lkp111138.plugin.npc;
 
 import me.lkp111138.plugin.Main;
+import me.lkp111138.plugin.item.CustomItem;
+import me.lkp111138.plugin.quest.Quest;
+import me.lkp111138.plugin.quest.QuestProgress;
+import me.lkp111138.plugin.rpg.Stats;
+import me.lkp111138.plugin.util.Util;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import java.io.File;
@@ -35,7 +44,8 @@ public class NPC {
     private static Map<Integer, NPC> npcRegistry = new HashMap<>();
     private static int nextId;
 
-    public NPC(Map map, InteractionHandler handler) {
+    @SuppressWarnings("unchecked")
+    public NPC(Map map) {
         this.id = (Integer) map.getOrDefault("id", nextId++);
         String worldName = (String) map.get("world");
         World world = getServer().getWorld(worldName);
@@ -50,16 +60,124 @@ public class NPC {
         this.startTrackingRange = (Integer) map.getOrDefault("start_tracking_range", 4);
         this.trackingRange = (Integer) map.getOrDefault("tracking_range", 8);
         this.location = new Location(world, x, y, z, yaw, pitch);
-        this.handler = handler;
+        String function = (String) map.get("function");
+        switch (function) {
+            case "quest":
+                this.handler = ((event, npc) -> {
+                    Quest quest = Quest.forNPC(npc.id);
+                    if (quest == null) {
+                        return;
+                    }
+                    Player clicker = event.getPlayer();
+                    Stats stats = Stats.extractFromEntity(clicker);
+                    if (stats == null) {
+                        return;
+                    }
+                    QuestProgress progress = stats.getQuestProgress().get(quest.id);
+                    Quest.QuestStage currentStage;
+                    if (progress == null) {
+                        currentStage = null;
+                    } else {
+                        if (progress.getStage() == -1) {
+                            // todo check for repeatable quest and reset progress
+                            return;
+                        }
+                        currentStage = quest.stages.get(progress.getStage());
+                    }
+                    if (npc.id == quest.startNPC || (currentStage != null && npc.id == currentStage.npc)) {
+                        // try to advance in quest
+                        PlayerInventory inv = clicker.getInventory();
+                        Map<String, Integer> remainingItems = new HashMap<>();
+                        List<ItemStack> toBeRemoved = new ArrayList<>();
+                        if (currentStage != null) {
+                            for (CustomItem customItem : currentStage.reqItems.keySet()) {
+                                remainingItems.put(customItem.getId(), currentStage.reqItems.get(customItem));
+                            }
+                        } else {
+                            for (CustomItem customItem : quest.reqItems.keySet()) {
+                                remainingItems.put(customItem.getId(), quest.reqItems.get(customItem));
+                            }
+                            // check other reqs also
+                            if (stats.getLevel() < quest.reqLevel) {
+                                Util.sendQuestDialog(clicker, quest.reqLevelHint);
+                                return;
+                            }
+                            for (String reqQuest : quest.reqQuests) {
+                                if (!stats.getQuestProgress().containsKey(reqQuest)) {
+                                    Util.sendQuestDialog(clicker, quest.reqQuestsHint);
+
+                                    return;
+                                }
+                            }
+                        }
+                        for (ItemStack slot : inv) {
+                            net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(slot);
+                            NBTTagCompound compound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
+                            String id = compound.getString("CustomItemId");
+                            if (id != null && remainingItems.containsKey(id)) {
+                                int remaining = remainingItems.get(id);
+                                if (slot.getAmount() < remaining) {
+                                    toBeRemoved.add(slot);
+                                    remainingItems.put(id, remaining - slot.getAmount());
+                                } else {
+                                    ItemStack clone = slot.clone();
+                                    clone.setAmount(remaining);
+                                    toBeRemoved.add(clone);
+                                    remainingItems.remove(id);
+                                }
+                            }
+                            if (remainingItems.isEmpty()) {
+                                break;
+                            }
+                        }
+                        if (!remainingItems.isEmpty()) {
+                            // not enough items
+                            if (currentStage != null) {
+                                Util.sendQuestDialog(clicker, currentStage.hint);
+                            } else {
+                                Util.sendQuestDialog(clicker, quest.reqItemsHint);
+                            }
+                        } else {
+                            inv.removeItem(toBeRemoved.toArray(new ItemStack[0]));
+                            if (currentStage != null) {
+                                // enough items, can advance
+                                Util.sendQuestDialog(clicker, currentStage.dialog);
+
+                                if (currentStage.isFinal) {
+                                    // completed quest, give rewards
+                                    stats.addXP(quest.rewardXP);
+                                    quest.rewardItems.forEach((key, val) -> inv.addItem(key.getItemStack(val)));
+                                    progress.setStage(-1);
+                                    clicker.sendMessage(Quest.finishedText.replaceAll("\\$\\{name}", quest.name));
+                                    if (quest.rewardXP > 0) {
+                                        clicker.sendMessage("\u00a77+" + quest.rewardXP + " XP");
+                                    }
+                                    for (CustomItem item : quest.rewardItems.keySet()) {
+                                        clicker.sendMessage("\u00a77+" + quest.rewardItems.get(item) + " " + item.getName());
+                                    }
+                                } else {
+                                    // completed stage
+                                    progress.setStage(progress.getStage() + 1);
+                                    clicker.sendMessage(Quest.advanceText);
+                                }
+                            } else {
+                                // enough items, can start
+                                Util.sendQuestDialog(clicker, quest.startDialog);
+                                stats.getQuestProgress().put(quest.id, new QuestProgress(quest.id, 0, System.currentTimeMillis()));
+                                clicker.sendMessage(Quest.startedText);
+                            }
+                        }
+                    }
+                });
+                break;
+            default:
+                this.handler = (event, npc) -> event.getPlayer().sendMessage("\u00a7aYou clicked on NPC #" + npc.getId());
+        }
 
         npcRegistry.put(this.id, this);
         if (nextId <= this.id) {
             nextId = this.id + 1;
         }
-    }
-
-    public NPC(Map map) {
-        this(map, (event, npc1) -> event.getPlayer().sendMessage("\u00a7aYou clicked on NPC #" + npc1.getId()));
     }
 
     public static NPC get(int id) {
@@ -70,7 +188,7 @@ public class NPC {
         FileConfiguration config = YamlConfiguration.loadConfiguration(new File(Main.getInstance().getDataFolder(), "npc.yml"));
         System.out.println(config.getKeys(false));
         config.set("npc", npcRegistry.values().stream().map(npc -> {
-            Map m = new HashMap();
+            Map<String, Object> m = new HashMap<>();
             m.put("id", npc.id);
             m.put("world", npc.location.getWorld().getName());
             m.put("x", npc.location.getBlockX());
@@ -199,7 +317,7 @@ public class NPC {
         return 0;
     }
 
-    public InteractionHandler getHandler() {
+    InteractionHandler getHandler() {
         return handler;
     }
 
