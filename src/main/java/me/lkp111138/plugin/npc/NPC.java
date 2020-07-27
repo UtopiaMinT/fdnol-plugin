@@ -84,13 +84,14 @@ public class NPC {
                                     stats.getQuestProgress().remove(quest.id);
                                 } else {
                                     Util.sendQuestDialog(clicker, quest.unavailableHint);
+                                    return;
                                 }
                             } else {
                                 Util.sendQuestDialog(clicker, quest.unavailableHint);
                                 return;
                             }
                         }
-                        if (progress != null) {
+                        if (progress != null && progress.getStage() >= 0) {
                             currentStage = quest.stages.get(progress.getStage());
                         }
                     }
