@@ -113,6 +113,11 @@ public class CustomMobEventListener implements Listener {
         if (stats != null) {
             stats.setShowBar(false);
         }
+        CustomMob customMob = CustomMob.extractFromEntity(entity);
+        if (customMob != null) {
+            e.getDrops().clear();
+            e.getDrops().addAll(customMob.getDrops());
+        }
     }
 
     // zombies no longer burn in the sun
