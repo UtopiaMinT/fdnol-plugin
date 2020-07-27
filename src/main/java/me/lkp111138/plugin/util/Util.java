@@ -1,10 +1,8 @@
 package me.lkp111138.plugin.util;
 
-import me.lkp111138.plugin.quest.Quest;
 import org.bukkit.entity.Player;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.UUID;
 
 public class Util {
@@ -123,32 +121,5 @@ public class Util {
      */
     public static String nToString(int n) {
         return nToString(n, false);
-    }
-
-    public static String questionmarksForQuery(int fieldCount, int rowCount) {
-        // (?,?,?),(?,?,?)
-        StringBuilder rowBuilder = new StringBuilder("(");
-        for (int i = 0; i < fieldCount; i++) {
-            rowBuilder.append("?,");
-        }
-        rowBuilder.setLength(rowBuilder.length() - 1);
-        rowBuilder.append(")");
-        String row = rowBuilder.toString();
-        rowBuilder.setLength(0);
-        for (int i = 0; i < rowCount; i++) {
-            rowBuilder.append(row).append(",");
-        }
-        rowBuilder.setLength(rowBuilder.length() - 1);
-        return rowBuilder.toString();
-    }
-
-    public static void sendQuestDialog(Player player, List<String> dialog) {
-        String prefix = Quest.dialogPrefix.replaceAll("\\$\\{total}", String.valueOf(dialog.size()));
-        for (int i = 0; i < dialog.size(); i++) {
-            String s = dialog.get(i);
-            // todo send with delay
-            String localPrefix = prefix.replaceAll("\\$\\{index}", String.valueOf(i + 1));
-            player.sendMessage(localPrefix + s);
-        }
     }
 }

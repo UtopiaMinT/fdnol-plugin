@@ -7,9 +7,7 @@ import me.lkp111138.plugin.item.CustomItem;
 import me.lkp111138.plugin.npc.NPC;
 import me.lkp111138.plugin.npc.NPCEventListener;
 import me.lkp111138.plugin.npc.task.TrackingTask;
-import me.lkp111138.plugin.quest.Quest;
 import me.lkp111138.plugin.rpg.items.RpgItem;
-import me.lkp111138.plugin.rpg.items.RpgItemEventListener;
 import me.lkp111138.plugin.rpg.mob.CustomMob;
 import me.lkp111138.plugin.rpg.mob.CustomMobEventListener;
 import me.lkp111138.plugin.rpg.task.HealthBarTask;
@@ -39,7 +37,7 @@ public class Main extends JavaPlugin {
             pool = new ConnectionPool(connString, 3, 10);
         } catch (SQLException e) {
             e.printStackTrace();
-            // database init must succeed, or die
+            // database init much succeed, or die
             getServer().shutdown();
             return;
         }
@@ -64,19 +62,12 @@ public class Main extends JavaPlugin {
         for (String key : mobSection.getKeys(false)) {
             new CustomMob(key, mobSection.getConfigurationSection(key));
         }
-        // rpg items
+        // rpi items
         FileConfiguration rpgItemConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "rpgitems.yml"));
         RpgItem.init(rpgItemConfig.getConfigurationSection("config"));
         ConfigurationSection rpgItemSection = rpgItemConfig.getConfigurationSection("rpgitems");
         for (String key : rpgItemSection.getKeys(false)) {
             new RpgItem(key, rpgItemSection.getConfigurationSection(key));
-        }
-        // quests
-        FileConfiguration questConfig = YamlConfiguration.loadConfiguration(new File(getDataFolder(), "quests.yml"));
-        Quest.init(questConfig.getConfigurationSection("config"));
-        ConfigurationSection questSection = questConfig.getConfigurationSection("quests");
-        for (String key : questSection.getKeys(false)) {
-            new Quest(key, questSection.getConfigurationSection(key));
         }
         saveConfig();
 
@@ -98,7 +89,6 @@ public class Main extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new NPCEventListener(), this);
         this.getServer().getPluginManager().registerEvents(new CustomMobEventListener(), this);
         this.getServer().getPluginManager().registerEvents(new ChestGuiEventListener(), this);
-        this.getServer().getPluginManager().registerEvents(new RpgItemEventListener(), this);
     }
 
     @Override

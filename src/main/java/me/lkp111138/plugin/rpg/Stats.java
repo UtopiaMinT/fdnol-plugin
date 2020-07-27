@@ -1,7 +1,6 @@
 package me.lkp111138.plugin.rpg;
 
 import me.lkp111138.plugin.Main;
-import me.lkp111138.plugin.quest.QuestProgress;
 import me.lkp111138.plugin.rpg.damage.ElementalDamage;
 import me.lkp111138.plugin.rpg.damage.ElementalDamageRange;
 import me.lkp111138.plugin.rpg.defense.ElementalDefense;
@@ -127,7 +126,6 @@ public class Stats {
     private boolean showBar;
     private ArmorStand barEntity;
 
-    private Map<String, QuestProgress> questProgress = new HashMap<>();
 
     public Stats(Entity entity) {
         this.entity = entity;
@@ -544,10 +542,6 @@ public class Stats {
         this.xpAwarded = xpAwarded;
     }
 
-    public Map<String, QuestProgress> getQuestProgress() {
-        return questProgress;
-    }
-
     public static Stats extractFromEntity(Entity entity) {
         for (MetadataValue value : entity.getMetadata("rpg")) {
             if (value.getOwningPlugin().equals(Main.getInstance())) {
@@ -560,8 +554,7 @@ public class Stats {
     public void save() throws SQLException{
         try (Connection conn = Main.getInstance().getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("REPLACE INTO player_stats (uuid, username, power_skill, defense_skill, speed_skill, intel_skill, free_skill, total_xp, deaths, health) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            byte[] uuid = Util.getBytesFromUUID(this.uuid);
-            stmt.setBytes(1, uuid);
+            stmt.setBytes(1, Util.getBytesFromUUID(uuid));
             stmt.setString(2, entity.getName());
             stmt.setInt(3, powerSkill);
             stmt.setInt(4, defenseSkill);
@@ -573,21 +566,6 @@ public class Stats {
             stmt.setDouble(10, health);
             stmt.execute();
             stmt.close();
-
-            if (questProgress.size() > 0) {
-                String questionmarks = Util.questionmarksForQuery(4, questProgress.size());
-                stmt = conn.prepareStatement("REPLACE INTO quest_log (uuid, quest_id, timestamp, stage) VALUES " + questionmarks);
-                int i = 0;
-                for (QuestProgress progress : questProgress.values()) {
-                    stmt.setBytes(4 * i + 1, uuid);
-                    stmt.setString(4 * i + 2, progress.getQuestId());
-                    stmt.setLong(4 * i + 3, progress.getTimestamp());
-                    stmt.setInt(4 * i + 4, progress.getStage());
-                    ++i;
-                }
-                stmt.execute();
-                stmt.close();
-            }
         }
     }
 }
