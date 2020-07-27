@@ -10,9 +10,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CustomItem {
@@ -22,10 +20,12 @@ public class CustomItem {
     private int damage;
     private List<String> lore;
     private ConfigurationSection enchantments;
+    private int currencyValue;
     private int hideFlags;
     private boolean unbreakable;
 
     private static Map<String, CustomItem> itemRegistry = new HashMap<>();
+    private static List<CustomItem> currencies = new ArrayList<>();
 
     public CustomItem(String id, ConfigurationSection m) {
         this.id = id;
@@ -39,10 +39,20 @@ public class CustomItem {
         this.material.hashCode();
         this.damage = m.getInt("damage", 0);
         this.lore = m.getStringList("lore");
+        this.currencyValue = m.getInt("currency_value", 0);
         this.hideFlags = m.getInt("hideflags", 0);
         this.enchantments = m.getConfigurationSection("enchantments");
         this.unbreakable = m.getBoolean("unbreakable", false);
         itemRegistry.put(id, this);
+        if (currencyValue > 0) {
+            int i = 0;
+            for (int j = 0; j < currencies.size(); ++j) {
+                if (currencies.get(i).currencyValue < currencyValue) {
+                    break;
+                }
+            }
+            currencies.add(i, this);
+        }
     }
 
     public ItemStack getItemStack(int amount) {
@@ -88,5 +98,22 @@ public class CustomItem {
 
     public static CustomItem getItem(String id) {
         return itemRegistry.get(id);
+    }
+
+    public static List<ItemStack> getCurrencyStacks(int value) {
+        List<ItemStack> stacks = new ArrayList<>();
+        ItemStack currentStack = null;
+        Iterator<CustomItem> currencyIterator = currencies.iterator();
+        while (value > 0 && currencyIterator.hasNext()) {
+            CustomItem currentItem = currencyIterator.next();
+            int count = value / currentItem.currencyValue;
+            if (count == 0) {
+                continue;
+            }
+            currentStack = currentItem.getItemStack(count);
+            value -= count * currentItem.currencyValue;
+            stacks.add(currentStack);
+        }
+        return stacks;
     }
 }

@@ -27,6 +27,7 @@ public class Quest {
     public final int cooldown;
     public final List<QuestStage> stages;
     public final int rewardXP;
+    public final int rewardCurrency;
     public final Map<CustomItem, Integer> rewardItems;
     public final int startNPC;
     public final List<String> startDialog;
@@ -64,6 +65,7 @@ public class Quest {
         this.unavailableHint = section.getStringList("unavailable_hint");
         this.cooldown = section.getInt("cooldown");
         this.rewardXP = section.getInt("reward.xp");
+        this.rewardCurrency = section.getInt("reward.currency");
         Map<CustomItem, Integer> rewardItems = new HashMap<>();
         ConfigurationSection rewardItemSection = section.getConfigurationSection("reward.items");
         if (rewardItemSection != null) {

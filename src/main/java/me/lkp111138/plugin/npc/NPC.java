@@ -95,7 +95,7 @@ public class NPC {
                             currentStage = quest.stages.get(progress.getStage());
                         }
                     }
-                    if (npc.id == quest.startNPC || (currentStage != null && npc.id == currentStage.npc)) {
+                    if ((currentStage == null && npc.id == quest.startNPC) || (currentStage != null && npc.id == currentStage.npc)) {
                         // try to advance in quest
                         PlayerInventory inv = clicker.getInventory();
                         Map<String, Integer> remainingItems = new HashMap<>();
@@ -155,6 +155,10 @@ public class NPC {
                                 if (currentStage.isFinal) {
                                     // completed quest, give rewards
                                     stats.addXP(quest.rewardXP);
+                                    List<ItemStack> stacks = CustomItem.getCurrencyStacks(quest.rewardCurrency);
+                                    for (ItemStack stack : stacks) {
+                                        clicker.getInventory().addItem(stack);
+                                    }
                                     quest.rewardItems.forEach((key, val) -> inv.addItem(key.getItemStack(val)));
                                     progress.setStage(-1);
                                     clicker.sendMessage(Quest.finishedText.replaceAll("\\$\\{name}", quest.name));
